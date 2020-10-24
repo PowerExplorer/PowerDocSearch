@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths
+	xmlns:android="http://schemas.android.com/apk/res/android" >
+	>
+    <external-path name="package_root" path="Android/data/net.gnu.agrep/" />
+    <external-path name="storage_root" path="." />
+    <external-path name="external_files" path="."/>
+    
+    <root-path name="external_files" path="/storage/" />
+</paths>
+

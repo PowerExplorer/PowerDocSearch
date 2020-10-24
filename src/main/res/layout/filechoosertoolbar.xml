@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/directory_buttons"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:layout_gravity="right|center_vertical"
+	android:gravity="right|center_vertical"
+	android:background="@drawable/ripple"
+	android:orientation="horizontal">
+
+	<TextView 
+		android:id="@+id/title"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_weight="100"
+		android:layout_alignParentLeft="true"
+		android:layout_toLeftOf="@+id/cancelDir"
+		android:text="@string/pick_title"
+		android:textColor="@color/lightyellow"
+		android:singleLine="true"
+		android:ellipsize="middle"
+		android:gravity="left|center_vertical"
+		android:layout_gravity="left|center_vertical"
+		android:textSize="20sp"
+		android:textAppearance="?android:textAppearanceLarge"
+	/>
+	<ImageButton
+		android:id="@+id/cancelDir"
+		android:layout_width="56dp"
+		android:layout_height="match_parent"
+		android:layout_toLeftOf="@+id/okDir"
+		android:layout_gravity="center"
+		android:gravity="center"
+		android:layout_weight="1"
+		android:onClick="cancel"
+		android:text="Cancel"
+		android:src="@drawable/delete" 
+		android:background="@drawable/ripple"
+		android:layout_margin="0dp" />
+
+	<ImageButton
+		android:id="@+id/okDir"
+		android:layout_width="56dp"
+		android:layout_height="match_parent"
+		android:layout_alignParentRight="true"
+		android:layout_gravity="center"
+		android:gravity="center"
+		android:layout_weight="1"
+		android:onClick="ok"
+		android:text="OK"
+		android:src="@drawable/install" 
+		android:background="@drawable/ripple"
+		android:layout_margin="0dp" />
+
+
+</RelativeLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+	xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item android:title="@string/label_option"
+		android:id="@+id/menu_option"
+		android:icon = "@drawable/ic_menu_preferences"
+		android:alphabeticShortcut = "O"></item>
+
+	<item android:title="Save Clipboard"
+		android:id="@+id/menu_save_clipboard"
+		android:alphabeticShortcut = "C"></item>
+	
+		
+		<!---
+	<item android:title="@string/help" android:id="@+id/help"
+    android:icon = "@android:drawable/ic_menu_help"
+    android:alphabeticShortcut = "H"></item>
+	-->
+
+</menu>

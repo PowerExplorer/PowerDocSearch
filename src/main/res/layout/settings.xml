@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+	android:background="@color/lightyellow"
+    android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+>
+	<LinearLayout 
+		android:id="@+id/LinearLayout01"
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+		<ImageButton
+			android:layout_width="40dp"
+			android:layout_height="40dp"
+			android:src="@drawable/ic_history_black_36dp"
+			android:background="@drawable/ripple"
+			android:id="@+id/ButtonHistory"
+			android:tint="#FF6FBF5D"
+		/>
+		<AutoCompleteTextView
+			android:id="@+id/EditText01"
+			android:layout_width="0dip"
+			android:capitalize="none"
+			android:layout_weight="1"
+			android:layout_height="fill_parent"
+			android:singleLine="true"
+			android:hint="@string/label_hint"
+			android:completionThreshold="1"
+			android:imeOptions="flagNoExtractUi|actionSearch"
+		/>
+		<ImageButton
+			android:layout_width="40dp"
+			android:layout_height="40dp"
+			android:src="@drawable/delete"
+			android:background="@drawable/ripple"
+			android:id="@+id/ButtonClear"
+		/>
+		<ImageButton
+			android:layout_width="40dp"
+			android:layout_height="40dp"
+			android:src="@drawable/ic_menu_search"
+			android:background="@drawable/ripple"
+			android:id="@+id/ButtonSearch"
+			android:tint="#FF6FBF5D"
+		/>
+	</LinearLayout>
+
+	<FrameLayout
+		android:id="@+id/flipper"
+		android:layout_width="fill_parent"
+		android:layout_height="0dip"
+		android:layout_weight="1"
+	>
+
+		<LinearLayout
+			android:id="@+id/upper"
+			android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:visibility="visible"
+		>
+
+			<LinearLayout
+				android:id="@+id/searchOption"
+				android:orientation="horizontal"
+				android:paddingLeft="5dp"
+				android:paddingRight="5dp"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+
+				<CheckBox
+					android:id="@+id/checkre"
+					android:text="@string/label_re"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:textSize="15sp"
+				/>
+				<CheckBox
+					android:id="@+id/checkignorecase"
+					android:text="@string/label_ignore_case"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:textSize="15sp"
+				/>
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/extLabel"
+				android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+				<ImageButton
+					android:layout_width="40dp"
+					android:layout_height="40dp"
+					android:src="@drawable/ic_add"
+					android:background="@drawable/ripple"
+					android:id="@+id/addext"
+				/>
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="left|center_vertical"
+					android:textSize="20sp"
+					android:text="@string/label_ext"
+				/>
+				<ImageButton
+					android:layout_width="40dp"
+					android:layout_height="40dp"
+					android:src="@drawable/delete"
+					android:background="@drawable/ripple"
+					android:id="@+id/ButtonClearExt"
+				/>
+			</LinearLayout>
+
+			<GridLayout
+				android:id="@+id/listext"
+				android:orientation="horizontal"
+				android:paddingLeft="5dp"
+				android:paddingRight="5dp"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:columnCount="5"
+			/>
+
+			<LinearLayout
+				android:id="@+id/dirLabel"
+				android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+
+				<ImageButton
+					android:layout_width="40dp"
+					android:layout_height="40dp"
+					android:background="@drawable/ripple"
+					android:src="@drawable/ic_add"
+					android:id="@+id/adddir"
+				/>
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="left|center_vertical"
+					android:textSize="20sp"
+					android:text="@string/label_dir"
+				/>
+				<ImageButton
+					android:layout_width="40dp"
+					android:layout_height="40dp"
+					android:src="@drawable/delete"
+					android:background="@drawable/ripple"
+					android:id="@+id/ButtonClearDir"
+				/>
+			</LinearLayout>
+
+			<ListView
+				android:id="@+id/listdir"
+				android:paddingLeft="5dp"
+				android:paddingRight="5dp"
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:orientation="vertical"
+				android:fillViewport="true"
+			/>
+
+		</LinearLayout>
+
+		<net.gnu.agrep.GrepView
+			android:id="@+id/DicView01"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:visibility="gone"
+			android:background="@color/lightyellow"
+		/>
+
+	</FrameLayout>
+
+	<TextView
+		android:id="@+id/status"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:singleLine="true"
+		android:paddingLeft="5dp"
+		android:layout_gravity="left|center_vertical"
+		android:textSize="9sp"
+		android:text="Long press to remove item"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:background="@color/lightbrown"
+	/>
+
+</LinearLayout>
