@@ -472,44 +472,43 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 		}
 		final InputStream is;
 		try {
-			is = new BufferedInputStream(new FileInputStream(file), 65536);
-			is.mark(65536);
-
-			//  文字コードの判定
-			String encode = null;
-			try {
-				final UniversalDetector detector = new UniversalDetector();
-				try {
-					int nread;
-					byte[] buff = new byte[4096];
-					if ((nread = is.read(buff)) > 0) {
-						detector.handleData(buff, 0, nread);
-					}
-					detector.dataEnd();
-				} catch ( FileNotFoundException e ) {
-					e.printStackTrace();
-					is.close();
-					return true;
-				} catch (IOException e) {
-					e.printStackTrace();
-					is.close();
-					return true;
-				}
-				encode = detector.getCharset();
-				detector.reset();
-				detector.destroy();
-			} catch ( UniversalDetector.DetectorException e) {
-			}
-			is.reset();
+			is = new BufferedInputStream(new FileInputStream(file));//, 65536);
+//			is.mark(65536);
+//
+//			//  文字コードの判定
+//			String encode = null;
+//			try {
+//				final UniversalDetector detector = new UniversalDetector();
+//				try {
+//					int nread;
+//					byte[] buff = new byte[4096];
+//					if ((nread = is.read(buff)) > 0) {
+//						detector.handleData(buff, 0, nread);
+//					}
+//					detector.dataEnd();
+//				} catch ( FileNotFoundException e ) {
+//					e.printStackTrace();
+//					is.close();
+//					return true;
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//					is.close();
+//					return true;
+//				}
+//				encode = detector.getCharset();
+//				detector.reset();
+//				detector.destroy();
+//			} catch ( UniversalDetector.DetectorException e) {
+//			}
+//			is.reset();
 
 			BufferedReader br=null;
 			try {
-				if (encode != null) {
-					br = new BufferedReader(new InputStreamReader(is, encode), 8192);
-
-				} else {
-					br = new BufferedReader(new InputStreamReader(is), 8192);
-				}
+//				if (encode != null) {
+//					br = new BufferedReader(new InputStreamReader(is, encode), 65536);
+//				} else {
+					br = new BufferedReader(new InputStreamReader(is), 65536);
+				//}
 
 				String text;
 				int line = 0;

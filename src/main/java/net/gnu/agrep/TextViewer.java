@@ -116,37 +116,37 @@ public class TextViewer extends Activity implements OnItemLongClickListener , On
                 InputStream is;
                 try {
                     is = new BufferedInputStream(new FileInputStream(f) , 65536);
-                    is.mark(65536);
-
-                    String encode = null;
-                    //  文字コードの判定
-                    try {
-                        UniversalDetector detector = new UniversalDetector();
-                        try {
-                            int nread;
-                            byte[] buff = new byte[4096];
-                            if ((nread = is.read(buff)) > 0) {
-                                detector.handleData(buff, 0, nread);
-                            }
-                            detector.dataEnd();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            is.close();
-                            return false;
-                        }
-                        encode = detector.getCharset();
-                        is.reset();
-                        detector.reset();
-                        detector.destroy();
-                    } catch ( UniversalDetector.DetectorException e ) {
-                    }
+//                    is.mark(65536);
+//
+//                    String encode = null;
+//                    //  文字コードの判定
+//                    try {
+//                        UniversalDetector detector = new UniversalDetector();
+//                        try {
+//                            int nread;
+//                            byte[] buff = new byte[4096];
+//                            if ((nread = is.read(buff)) > 0) {
+//                                detector.handleData(buff, 0, nread);
+//                            }
+//                            detector.dataEnd();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                            is.close();
+//                            return false;
+//                        }
+//                        encode = detector.getCharset();
+//                        is.reset();
+//                        detector.reset();
+//                        detector.destroy();
+//                    } catch ( UniversalDetector.DetectorException e ) {
+//                    }
                     BufferedReader br=null;
                     try {
-                        if (encode != null) {
-                            br = new BufferedReader(new InputStreamReader(is , encode) , 8192);
-                        } else {
-                            br = new BufferedReader(new InputStreamReader(is) , 8192);
-                        }
+//                        if (encode != null) {
+//                            br = new BufferedReader(new InputStreamReader(is , encode) , 65536);
+//                        } else {
+                            br = new BufferedReader(new InputStreamReader(is) , 65536);
+                        //}
 
                         String text;
                         while ((text = br.readLine()) != null) {
