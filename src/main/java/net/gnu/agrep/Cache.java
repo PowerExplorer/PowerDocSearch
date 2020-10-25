@@ -160,7 +160,7 @@ public class Cache implements Serializable, Iterator<File> {
 		} else {
 			//final String fileContent = FileUtil.readFileAsCharsetMayCheckEncode(file, HtmlUtil.UTF8);
 			//lru.put(file, fileContent);
-			Log.d(TAG, "missed " + file.getAbsolutePath());
+			//Log.d(TAG, "missed " + file.getAbsolutePath());
 			return add(file);
 		}
 	}

@@ -122,6 +122,7 @@ public class AGrepActivity extends StorageCheckActivity {
 			tabCount = sp.getInt(Prefs.KEY_TAB_COUNT, 1);
 			increaseTabNo = savedInstanceState.getInt("increaseTabNo");
 			curIndex = savedInstanceState.getInt("curIndex");
+			slideFrag.setCurrentItem(curIndex);
 		}
 	}
 
@@ -154,17 +155,9 @@ public class AGrepActivity extends StorageCheckActivity {
 
 	@Override
 	public void onResume() {
-		Log.d(TAG, "onResume tabCount=" + tabCount);
+		Log.d(TAG, "onResume tabCount=" + tabCount + ", curIndex " + curIndex);
 		super.onResume();
-		if (curIndex == -1) {
-			if (tabCount == 1) {
-				slideFrag.setCurrentItem(0);
-			} else {
-				slideFrag.setCurrentItem(1);
-			}
-		} else {
-			slideFrag.setCurrentItem(curIndex);
-		}
+
 		if (main == null) {
 			main = slideFrag.getCurFrag();
 		}
@@ -246,22 +239,6 @@ public class AGrepActivity extends StorageCheckActivity {
 		
 		editor.commit();
 	}
-	
-	public void quit() {
-		Log.d(TAG, "quit " + main);
-		saved = 0;
-		tabCount = slideFrag.getCount();
-		if (tabCount == 1) {
-			final SettingsFragment item = slideFrag.getItem(0);
-			//item.confirmSave(item.mProcQuit);
-		} else {
-			for (int i = slideFrag.getCount() - 2; i >= 1; i--) {
-				final SettingsFragment item = slideFrag.getItem(i);
-				//item.confirmSave(item.mProcQuit);
-			}
-		}
-		//m.confirmSave(m.mProcQuit);
-	}
 
 	@Override
     protected void onNewIntent(Intent intent) {
@@ -269,10 +246,6 @@ public class AGrepActivity extends StorageCheckActivity {
 		if (intent != null && !Intent.ACTION_MAIN.equals(intent.getAction())) {
 			slideFrag.addTab(intent);
 		}
-		//m.onNewIntent(intent);
-		//intent = getIntent();
-		//setIntent(null);
-
 	}
 
     @Override
@@ -307,18 +280,6 @@ public class AGrepActivity extends StorageCheckActivity {
 	
 	void updateClipData(boolean updateType) {
         ClipData clip = mClipboard.getPrimaryClip();
-//        String[] mimeTypes = clip != null ? clip.getDescription().filterMimeTypes("*/*") : null;
-//        if (mimeTypes != null) {
-//            mMimeTypes.setText("");
-//            for (int i=0; i<mimeTypes.length; i++) {
-//                if (i > 0) {
-//                    mMimeTypes.append("\n");
-//                }
-//                mMimeTypes.append(mimeTypes[i]);
-//            }
-//        } else {
-//            mMimeTypes.setText("NULL");
-//        }
 
         if (clip != null) {
             if (savingClipboard && fw != null) {
