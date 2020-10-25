@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
-import org.mozilla.universalchardet.UniversalDetector;
 import java.io.FileNotFoundException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -335,7 +334,6 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 		return true;
 	}
 
-	final Pattern htmPat = Pattern.compile("(txt|htm|html|xhtml)");
 	final Pattern htmlPat = Pattern.compile("(htm|html|xhtml|shtm|shtml)");
 	final Pattern plainPat = Pattern.compile("(ini|mk|md|list|config|configure|js|bat|sh|lua|depend|java|c|cpp|h|hpp|jsp|machine|asm|css|desktop|inc|i|plist|pro|py|s|xpm|php|gradle)");
 	final Pattern zipPat = Pattern.compile("(zip|gz|7z|bz2|jar|tar|rar|arj|lzh|chm|xz|z)");
@@ -365,21 +363,18 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 		String ext = FileUtil.getExtensionFromName(inFilePathLowerCase);
 		String mimeTypeFromExtension = FileUtil.getMimeType(inFile);
 		// file duoc chon co duoi .converted
-		if (inFilePathLowerCase.endsWith(HtmlUtil.CONVERTED_TXT)
+		if (htmlPat.matcher(ext).matches()) {
+			fileContent = HtmlUtil.htmlToText(inFile);
+			fileContent = HtmlUtil.changeToVUTimes(fileContent);
+		} else if (inFilePathLowerCase.endsWith(HtmlUtil.CONVERTED_TXT)
 			|| inFilePathLowerCase.endsWith(".converted.txt")
-			|| (mimeTypeFromExtension.startsWith("text")
-			&& !htmPat.matcher(ext).matches())
-			|| plainPat.matcher(ext).matches()
 			) {
 			publishProgress("adding converted text " + inFilePath);
 			retainFrag.fileList.add(inFile);
 			// file txt được chọn có thể đã được convert từ trước nhưng đã cũ
-		} else if (ext.equals("txt")) {
+		} else if (plainPat.matcher(ext).matches()) {
 			publishProgress("converting " + inFilePath);
 			fileContent = FileUtil.readFileWithCheckEncode(inFilePath);
-			fileContent = HtmlUtil.changeToVUTimes(fileContent);
-		} else if (htmlPat.matcher(ext).matches()) {
-			fileContent = HtmlUtil.htmlToText(inFile);
 			fileContent = HtmlUtil.changeToVUTimes(fileContent);
 		} else if (ext.equals("pdf")) {
 			publishProgress("converting " + inFilePath);

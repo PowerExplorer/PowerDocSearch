@@ -157,7 +157,6 @@ public class AGrepActivity extends StorageCheckActivity {
 	public void onResume() {
 		Log.d(TAG, "onResume tabCount=" + tabCount + ", curIndex " + curIndex);
 		super.onResume();
-
 		if (main == null) {
 			main = slideFrag.getCurFrag();
 		}

@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import org.mozilla.universalchardet.UniversalDetector;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ClipData;

@@ -19,6 +19,7 @@ import net.gnu.util.HtmlUtil;
 import org.mozilla.universalchardet.UniversalDetector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.mozilla.universalchardet.CharsetListener;
 
 public class FileUtil {
 
@@ -538,6 +539,68 @@ public class FileUtil {
 		fileChannel.close();
 		raf.close();
 	}
+	
+	public static String detectCharset(final File file) {
+		Log.d(TAG, "detectCharset" + file);
+		InputStream is = null;
+		FileInputStream fis = null;
+		String encode = "utf-8";
+        try {
+			final long length = file.length();
+			final int len = (int)(length < 65536 ? length : 65536);
+            fis = new FileInputStream(file);
+			is = new BufferedInputStream(fis , len);
+
+            // preread leading 64KB
+            int nread;
+			int start = 0;
+            byte[] buff = new byte[len];
+            nread = is.read(buff);
+			if (length > 0) {
+				while ((nread = is.read(buff, start, len - start)) > 0) {
+					start += nread;
+				}
+			}
+//            if ( USE_JUNIVERSALCHARDET ){
+			//try {
+			final UniversalDetector detector = new UniversalDetector(
+				new CharsetListener() {
+					public void report(String name) {
+						Log.d(TAG, "charset = " + name + ", " + file.getAbsolutePath());
+					}
+				}
+			);
+			detector.handleData(buff, 0, nread);
+			detector.dataEnd();
+			encode = detector.getDetectedCharset();
+			detector.reset();
+//			} catch (Exception e1) {
+//				e1.printStackTrace();
+//			}
+
+//            }else{
+//                // Detect charset
+//                NativeUniversalDetector detector;
+//                if ( encode ==null || encode.length() == 0 ){
+//
+//                    try {
+//                        detector = new NativeUniversalDetector();
+//                        detector.handleData(buff, 0, nread);
+//                        detector.dataEnd();
+//                        encode = detector.getCharset();
+//                        detector.destroy();
+//                    } catch (DetectorException e1) {
+//                    }
+//                }
+//            }
+
+		} catch (IOException e1) {
+            e1.printStackTrace();
+        } finally {
+			FileUtil.close(fis, is);
+		}
+		return encode;
+	}
 
 	public static String readFileAsCharset(File fileName, String charsetName)
 	throws IOException {
@@ -564,7 +627,7 @@ public class FileUtil {
 				Log.d(TAG, "is UTF8 1: " + filePath);
 				return str;
 			} else {
-				String cs = UniversalDetector.detectCharset(new File(filePath));
+				String cs = detectCharset(new File(filePath));
 				String str;
 				if (cs != null) {
 					str = new String(byteArr, cs);
@@ -619,18 +682,20 @@ public class FileUtil {
 
 	public static String readFileByMetaTag(File file)
 	throws FileNotFoundException, IOException {
-		String content = FileUtil.readFileWithCheckEncode(file.getAbsolutePath());
+		String content = "";
 		String charsetName = "";
 		if ((charsetName = HtmlUtil.readValue(content, "charset")).length() > 0) {
-			Log.d(file.getAbsolutePath() + " charset: "
-				  , charsetName);
+			Log.d(TAG, "readFileByMetaTag charset "  + charsetName + ", " + file.getAbsolutePath());
 		}
 		try {
 			if (charsetName.length() > 0) {
 				content = new String(FileUtil.readFileToMemory(file.getAbsolutePath()), charsetName);
 				// Log.d(content);
+			} else {
+				content = FileUtil.readFileWithCheckEncode(file.getAbsolutePath());
 			}
 		} catch (UnsupportedEncodingException e) {
+			content = FileUtil.readFileWithCheckEncode(file.getAbsolutePath());
 			e.printStackTrace();
 		}
 		return content;
