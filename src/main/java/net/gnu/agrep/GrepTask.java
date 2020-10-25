@@ -117,9 +117,9 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 		if (isCancelled()) {
 			return;
 		}
-		//if (searchFragment != null) {
-		retainFrag.searchFragment.statusTV.setText("Found " + mFoundcount + " " + retainFrag.getString(R.string.progress, retainFrag.searchFragment.mQuery, mFileCount) + ", took " + Util.nf.format(System.nanoTime() - start) + " nano seconds");
-//			}
+		if (retainFrag.cache != null) {
+			retainFrag.searchFragment.statusTV.setText("Found " + mFoundcount + " " + retainFrag.getString(R.string.progress, retainFrag.searchFragment.mQuery, mFileCount) + ", cached " + retainFrag.cache.cacheStatus + ", took " + Util.nf.format(System.nanoTime() - start) + " ns");
+		}
 //			if (mProgressDialog != null) {
 //				mProgressDialog.setMessage(searchActivity.getString(R.string.progress, mQuery, mFileCount));
 //			}

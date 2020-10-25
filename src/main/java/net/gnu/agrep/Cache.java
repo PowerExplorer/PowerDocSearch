@@ -19,13 +19,14 @@ public class Cache implements Serializable, Iterator<File> {
 
 	private List<File> data = null;
 	private LruCache<File, String> lru = null;
-	private int currentSize = 0;
-	private int totalSize = 0;
+	public int currentSize = 0;
+	public int totalSize = 0;
 
 	private List<File> notYet;
 	private int counter = 0;
 	private int fileNum = 0;
 	private Iterator<File> iter = null;
+	String cacheStatus = "";
 	
 	public Cache(final Set<File> files) {
 		fileNum = files.size();
@@ -62,15 +63,8 @@ public class Cache implements Serializable, Iterator<File> {
 			}
 		}
 		iter = data.iterator();
-		Log.i(TAG, "cached " + currentSize + " freeMemory " + Runtime.getRuntime().freeMemory());
-	}
-
-	public int getTotalSize() {
-		return totalSize;
-	}
-
-	public int getCurrentSize() {
-		return currentSize;
+		cacheStatus = Util.nf.format(currentSize) + "/" + Util.nf.format(totalSize) + " bytes";
+		Log.i(TAG, "cached " + cacheStatus + " freeMemory " + Runtime.getRuntime().freeMemory());
 	}
 
 	private String add(final File file) {
