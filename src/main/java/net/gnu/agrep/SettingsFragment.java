@@ -220,9 +220,9 @@ public class SettingsFragment extends Fragment implements GrepView.Callback {
 				final FragmentTransaction transaction = supportFragmentManager.beginTransaction();
 				transaction.add(retainFrag, "retainFrag" + index);
 				transaction.commit();
-			} 
+				retainFrag.searchFragment = this;
+			}
 		}
-		retainFrag.searchFragment = this;
 		
 		final Parcelable[] parcelableArray;
         if (savedInstanceState != null && !fake
