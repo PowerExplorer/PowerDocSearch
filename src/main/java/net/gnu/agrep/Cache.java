@@ -14,6 +14,7 @@ import java.util.Set;
 
 public class Cache implements Serializable, Iterator<File> {
 
+	private static final String TAG = "Cache";
 	private static final long serialVersionUID = -7028012255185772017L;
 
 	private List<File> data = null;
@@ -25,17 +26,15 @@ public class Cache implements Serializable, Iterator<File> {
 	private int counter = 0;
 	private int fileNum = 0;
 	private Iterator<File> iter = null;
-
-	private String TAG = "Cache";
-
+	
 	public Cache(final Set<File> files) {
 		fileNum = files.size();
 		data = new LinkedList<File>();
 		lru = new LruCache<File, String>(9999);
 		notYet = new LinkedList<File>();
 		final long maxMemory = Runtime.getRuntime().maxMemory();
-		Log.i("maxMemory 1", "" + maxMemory);
-		final int maxSize = (int) (maxMemory >> 2);
+		Log.i(TAG, "maxMemory " + maxMemory);
+		final int maxSize = (int) (maxMemory >> 4);
 		long fileLength;
 		String fileName;
 		String content;
@@ -63,7 +62,7 @@ public class Cache implements Serializable, Iterator<File> {
 			}
 		}
 		iter = data.iterator();
-		Log.i("freeMemory 2: ", "" + Runtime.getRuntime().freeMemory());
+		Log.i(TAG, "cached " + currentSize + " freeMemory " + Runtime.getRuntime().freeMemory());
 	}
 
 	public int getTotalSize() {
@@ -89,7 +88,7 @@ public class Cache implements Serializable, Iterator<File> {
 				} else {
 					File f = null;
 					while (data.size() > 0) {
-						Log.i("Remove in dataSet " + counter + ": ", f + "");
+						//Log.i(TAG, "Remove in dataSet " + counter + ": " + f + "");
 						f = data.remove(0);
 						lru.remove(f);
 						currentSize -= f.length();
@@ -104,7 +103,7 @@ public class Cache implements Serializable, Iterator<File> {
 					currentSize += fileLength;
 				}
 			} catch (IOException e) {
-				Log.e("Cache.add", e.getMessage(), e);
+				Log.e(TAG, "Cache.add " + e.getMessage(), e);
 			}
 			return fileContent;
 		} else {
@@ -116,7 +115,7 @@ public class Cache implements Serializable, Iterator<File> {
 		if (file != null && file.isFile()) {
 			final long fileLength = file.length();
 			final int maxSize = (int) (Runtime.getRuntime().freeMemory() >> 2);
-			Log.i("Cache", "add " + file.getAbsolutePath() + ", freeMemory " + maxSize);
+			//Log.i(TAG, "add " + file.getAbsolutePath() + ", freeMemory " + maxSize);
 			
 			if ((currentSize + fileLength) < maxSize) {
 				//fileContent = FileUtil.readFileAsCharsetMayCheckEncode(file, HtmlUtil.UTF8);
@@ -127,7 +126,7 @@ public class Cache implements Serializable, Iterator<File> {
 				File f;
 				while (data.size() > 0) {
 					f = data.remove(0);
-					Log.i("Cache", "Remove at " + counter + ": " + f);
+					//Log.i(TAG, "Remove at " + counter + ": " + f);
 					lru.remove(f);
 					currentSize -= f.length();
 					notYet.add(f);
@@ -160,13 +159,14 @@ public class Cache implements Serializable, Iterator<File> {
 		return counter < fileNum;
 	}
 
-	public String get(final File file) throws IOException {
+	public String get(final File file) {
 		final String get = lru.get(file);
 		if (get != null) {
 			return get;
 		} else {
 			//final String fileContent = FileUtil.readFileAsCharsetMayCheckEncode(file, HtmlUtil.UTF8);
 			//lru.put(file, fileContent);
+			Log.d(TAG, "missed " + file.getAbsolutePath());
 			return add(file);
 		}
 	}
@@ -193,7 +193,7 @@ public class Cache implements Serializable, Iterator<File> {
 		throw new UnsupportedOperationException();
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		Set<File> files = null; // FileUtil.getFilesDialog(null, null, "/", true, JFileChooser.FILES_AND_DIRECTORIES, true, "Files or Folder");
 		int count = 0;
 		long start1 = System.currentTimeMillis();

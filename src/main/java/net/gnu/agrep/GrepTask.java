@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import net.gnu.util.Util;
 import net.gnu.pdfplugin.ITextUtil;
 import android.content.Context;
+import java.io.StringReader;
 
 public class GrepTask extends AsyncTask<String, Object, Boolean> {
 	private static final String TAG = "GrepTask";
@@ -147,7 +148,7 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 			wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
 			wl.acquire();
 
-			if (retainFrag.fileList == null) {
+			if (retainFrag.fileList == null || retainFrag.newSearch) {
 				retainFrag.fileList = new TreeSet<>();
 				for (CheckedString dir : retainFrag.searchFragment.mPrefs.mDirList) {
 					//Log.d(TAG, "grepRoot " + text + ", dir " + dir);
@@ -155,16 +156,18 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 						return false;
 					}
 				}
-				//retainFrag.cache = new Cache(retainFrag.fileList);
+				retainFrag.cache = new Cache(retainFrag.fileList);
+				retainFrag.newSearch = false;
 			}
-			
-//			while (retainFrag.cache.hasNext()) {
-//				grepFile(retainFrag.cache.next());
+			File next;
+			while (retainFrag.cache.hasNext()) {
+				next = retainFrag.cache.next();
+				grepFile(next, retainFrag.cache.get(next));
+			}
+//			for (File f : retainFrag.fileList) {
+//				grepFile(f);
 //			}
-			for (File f : retainFrag.fileList) {
-				grepFile(f);
-			}
-			//retainFrag.cache.reset();
+			retainFrag.cache.reset();
 		} finally {
 			if (wl != null) {
 				wl.release();
@@ -204,6 +207,105 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 				}
 			}
 		}
+		return true;
+	}
+
+	boolean grepFile(final File file, final String str) {
+		//Log.d(TAG, "grepFile " + file);
+		if (isCancelled()) {
+			return false;
+		}
+//		final InputStream is;
+//		try {
+//			is = new BufferedInputStream(new FileInputStream(file));//, 65536);
+//			is.mark(65536);
+//
+//			//  文字コードの判定
+//			String encode = null;
+//			try {
+//				final UniversalDetector detector = new UniversalDetector();
+//				try {
+//					int nread;
+//					byte[] buff = new byte[4096];
+//					if ((nread = is.read(buff)) > 0) {
+//						detector.handleData(buff, 0, nread);
+//					}
+//					detector.dataEnd();
+//				} catch ( FileNotFoundException e ) {
+//					e.printStackTrace();
+//					is.close();
+//					return true;
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//					is.close();
+//					return true;
+//				}
+//				encode = detector.getCharset();
+//				detector.reset();
+//				detector.destroy();
+//			} catch ( UniversalDetector.DetectorException e) {
+//			}
+//			is.reset();
+		BufferedReader br=null;
+		try {
+//				if (encode != null) {
+//					br = new BufferedReader(new InputStreamReader(is, encode), 65536);
+//				} else {
+			br = new BufferedReader(new StringReader(str));//new InputStreamReader(is), 65536);
+			//}
+
+			String text;
+			int line = 0;
+			Pattern pattern = retainFrag.searchFragment.mPattern;
+			Matcher m = null;
+			ArrayList<GrepView.Data>    data  = null ;
+			mFileCount++;
+			while ((text = br.readLine()) != null) {
+				line ++;
+				if (m == null) {
+					m = pattern.matcher(text);
+				} else {
+					m.reset(text);
+				}
+				if (m.find()) {
+					//found = true;
+
+					synchronized (retainFrag.mData) {
+						mFoundcount++;
+						if (data == null) {
+							data = new ArrayList<GrepView.Data>();
+						}
+						data.add(new GrepView.Data(file, line, text));
+
+						if (mFoundcount < 20) {
+							publishProgress(data.toArray(new GrepView.Data[0]));
+							data = null;
+						}
+					}
+					if (mCancelled) {
+						break;
+					}
+				}
+			}
+			//br.close();
+			//is.close();
+			if (data != null) {
+				publishProgress(data.toArray(new GrepView.Data[0]));
+				data = null;
+			} else {
+				publishProgress((GrepView.Data[])null);
+			}
+			//if (!found) {
+			//if (mFileCount % 10 == 0) {
+			//publishProgress((GrepView.Data[])null);
+			//}
+			//}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
 		return true;
 	}
 
@@ -462,106 +564,6 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 			totalSelectedSize += fileContent.getBytes().length;
 			Log.d("newFile exist", newFile + " just written: " + newFile.exists());
 		} 
-		return true;
-	}
-
-	boolean grepFile(final File file) {
-		//Log.d(TAG, "grepFile " + file);
-		if (isCancelled()) {
-			return false;
-		}
-		final InputStream is;
-		try {
-			is = new BufferedInputStream(new FileInputStream(file));//, 65536);
-//			is.mark(65536);
-//
-//			//  文字コードの判定
-//			String encode = null;
-//			try {
-//				final UniversalDetector detector = new UniversalDetector();
-//				try {
-//					int nread;
-//					byte[] buff = new byte[4096];
-//					if ((nread = is.read(buff)) > 0) {
-//						detector.handleData(buff, 0, nread);
-//					}
-//					detector.dataEnd();
-//				} catch ( FileNotFoundException e ) {
-//					e.printStackTrace();
-//					is.close();
-//					return true;
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//					is.close();
-//					return true;
-//				}
-//				encode = detector.getCharset();
-//				detector.reset();
-//				detector.destroy();
-//			} catch ( UniversalDetector.DetectorException e) {
-//			}
-//			is.reset();
-
-			BufferedReader br=null;
-			try {
-//				if (encode != null) {
-//					br = new BufferedReader(new InputStreamReader(is, encode), 65536);
-//				} else {
-					br = new BufferedReader(new InputStreamReader(is), 65536);
-				//}
-
-				String text;
-				int line = 0;
-				Pattern pattern = retainFrag.searchFragment.mPattern;
-				Matcher m = null;
-				ArrayList<GrepView.Data>    data  = null ;
-				mFileCount++;
-				while ((text = br.readLine()) != null) {
-					line ++;
-					if (m == null) {
-						m = pattern.matcher(text);
-					} else {
-						m.reset(text);
-					}
-					if (m.find()) {
-						//found = true;
-
-						synchronized (retainFrag.mData) {
-							mFoundcount++;
-							if (data == null) {
-								data = new ArrayList<GrepView.Data>();
-							}
-							data.add(new GrepView.Data(file, line, text));
-
-							if (mFoundcount < 20) {
-								publishProgress(data.toArray(new GrepView.Data[0]));
-								data = null;
-							}
-						}
-						if (mCancelled) {
-							break;
-						}
-					}
-				}
-				br.close();
-				is.close();
-				if (data != null) {
-					publishProgress(data.toArray(new GrepView.Data[0]));
-					data = null;
-				} else {
-					publishProgress((GrepView.Data[])null);
-				}
-				//if (!found) {
-				//if (mFileCount % 10 == 0) {
-				//publishProgress((GrepView.Data[])null);
-				//}
-				//}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
 		return true;
 	}
 }

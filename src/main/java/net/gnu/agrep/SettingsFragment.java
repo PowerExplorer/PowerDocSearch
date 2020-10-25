@@ -221,6 +221,7 @@ public class SettingsFragment extends Fragment implements GrepView.Callback {
 				transaction.add(retainFrag, "retainFrag" + index);
 				transaction.commit();
 				retainFrag.searchFragment = this;
+				retainFrag.newSearch = true;
 			}
 		}
 		
@@ -366,15 +367,16 @@ public class SettingsFragment extends Fragment implements GrepView.Callback {
                 final CheckedString strItem = (CheckedString) buttonView.getTag();
                 strItem.checked = isChecked;
                 //Log.d(TAG, "savePrefs3 " + no);
-				if (strItem.string.startsWith("/")) {
-					mPrefs.mDirList.remove(strItem);
-					mPrefs.mDirList.add(strItem);
-					Collections.sort(mPrefs.mDirList);
-				} else {
-					mPrefs.mExtList.remove(strItem);
-					mPrefs.mExtList.add(strItem);
-					Collections.sort(mPrefs.mExtList);
-				}
+//				if (strItem.string.startsWith("/")) {
+//					mPrefs.mDirList.remove(strItem);
+//					mPrefs.mDirList.add(strItem);
+//					Collections.sort(mPrefs.mDirList);
+//				} else {
+//					mPrefs.mExtList.remove(strItem);
+//					mPrefs.mExtList.add(strItem);
+//					Collections.sort(mPrefs.mExtList);
+//				}
+				retainFrag.newSearch = true;
 				mPrefs.savePrefs(mContext, index);
             }
         };

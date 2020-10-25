@@ -17,7 +17,8 @@ public class RetainFrag extends Fragment {
 	boolean hidden = false;
 	SettingsFragment searchFragment;
 	TreeSet<File> fileList;
-	//Cache cache;
+	Cache cache;
+	boolean newSearch = true;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
