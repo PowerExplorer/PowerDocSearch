@@ -6,10 +6,15 @@
 		android:id="@+id/menu_option"
 		android:icon = "@drawable/ic_menu_preferences"
 		android:alphabeticShortcut = "O"></item>
+		
+	<item android:title="Clear Cache"
+		android:id="@+id/menu_clear_cache"
+		android:alphabeticShortcut = "C"></item>
+	
 
 	<item android:title="Save Clipboard"
 		android:id="@+id/menu_save_clipboard"
-		android:alphabeticShortcut = "C"></item>
+		android:alphabeticShortcut = "S"></item>
 	
 		
 		<!---

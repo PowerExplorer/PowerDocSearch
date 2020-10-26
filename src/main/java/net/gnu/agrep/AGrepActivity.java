@@ -28,6 +28,9 @@ import java.io.IOException;
 import android.content.Intent;
 import android.content.ClipboardManager;
 import android.content.ClipData;
+import android.content.DialogInterface;
+import net.gnu.util.FileUtil;
+import android.app.AlertDialog;
 
 public class AGrepActivity extends StorageCheckActivity {
 
@@ -273,6 +276,39 @@ public class AGrepActivity extends StorageCheckActivity {
 					Log.e(TAG, e.getMessage(), e);
 				}
 			}
+		} else if (item.getItemId() == R.id.menu_clear_cache) {
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			alert.setTitle("Clear Caching Files");
+			alert.setIconAttribute(android.R.attr.alertDialogIcon);
+			long[] entry = new long[] {0, 0, 0};
+			FileUtil.getDirSize(SearcherAplication.PRIVATE_DIR, entry);
+			alert.setMessage("Cache has " + Util.nf.format(entry[2]) + " folders, " + Util.nf.format(entry[0])
+							 + " files, " + Util.nf.format(entry[1])
+							 + " bytes. " + "\r\nAre you sure you want to clear the cached files? "
+							 + "\r\nAfter cleaning searching will be slow for the first times " +
+							 "and the searching task maybe incorrect.");
+			alert.setCancelable(true);
+
+			alert.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						int num = FileUtil.deleteFiles(SearcherAplication.PRIVATE_DIR, true);
+						Log.d(TAG, "Clean cache" + num + " files deleted");
+						
+					}
+				});
+
+			alert.setPositiveButton("No", new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+					}
+				});
+
+			AlertDialog alertDialog = alert.create();
+			alertDialog.show();
 		}
         return super.onOptionsItemSelected(item);
     }
