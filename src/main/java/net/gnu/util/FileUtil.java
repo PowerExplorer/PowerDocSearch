@@ -541,7 +541,7 @@ public class FileUtil {
 	}
 	
 	public static String detectCharset(final File file) {
-		Log.d(TAG, "detectCharset" + file);
+		//Log.d(TAG, "detectCharset" + file);
 		InputStream is = null;
 		FileInputStream fis = null;
 		String encode = "utf-8";
@@ -555,7 +555,7 @@ public class FileUtil {
             int nread;
 			int start = 0;
             byte[] buff = new byte[len];
-            nread = is.read(buff);
+            //nread = is.read(buff);
 			if (length > 0) {
 				while ((nread = is.read(buff, start, len - start)) > 0) {
 					start += nread;
@@ -566,11 +566,11 @@ public class FileUtil {
 			final UniversalDetector detector = new UniversalDetector(
 				new CharsetListener() {
 					public void report(String name) {
-						Log.d(TAG, "charset = " + name + ", " + file.getAbsolutePath());
+						Log.d(TAG, "detectCharset = " + name + ", " + file.getAbsolutePath());
 					}
 				}
 			);
-			detector.handleData(buff, 0, nread);
+			detector.handleData(buff, 0, start);
 			detector.dataEnd();
 			encode = detector.getDetectedCharset();
 			detector.reset();
