@@ -1,0 +1,2 @@
+# Power DocSearch
+This is a local document seach app. It does not collect any private information. 

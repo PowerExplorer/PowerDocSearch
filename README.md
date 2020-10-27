@@ -4,5 +4,4 @@
 
 
 Open Source
-
 https://github.com/PowerExplorer/PowerDocSearch/
