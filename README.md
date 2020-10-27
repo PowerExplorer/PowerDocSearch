@@ -5,3 +5,7 @@
 
 Open Source
 https://github.com/PowerExplorer/PowerDocSearch/
+
+[<img alt="Get it on AFH" height="80" width="207" src="https://www.androidfilehost.com/images/afh.png">](https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190313.png)
+[<img alt="Get it on AFH" height="80" width="207" src="https://www.androidfilehost.com/images/afh.png">](https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190715.png)
+[<img alt="Get it on AFH" height="80" width="207" src="https://www.androidfilehost.com/images/afh.png">](https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190733.png)
