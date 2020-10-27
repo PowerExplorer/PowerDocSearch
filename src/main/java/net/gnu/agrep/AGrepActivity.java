@@ -44,6 +44,7 @@ public class AGrepActivity extends StorageCheckActivity {
 	public int tabCount = 0;
     public int increaseTabNo = 0;
 	private int curIndex = -1;
+	
 //	private ClipboardManager mClipboard;
 //	private FileWriter fw;
 //	
@@ -160,6 +161,16 @@ public class AGrepActivity extends StorageCheckActivity {
 	public void onResume() {
 		Log.d(TAG, "onResume tabCount=" + tabCount + ", curIndex " + curIndex);
 		super.onResume();
+		final int i = slideFrag.getCurIndex();
+		final int count = slideFrag.getCount();
+		if (count > 1) {
+			if (i > count - 2) {
+				slideFrag.setCurrentItem(i-1);
+			} else if (i == 0) {
+				slideFrag.setCurrentItem(1);
+			}
+		}
+
 		if (main == null) {
 			main = slideFrag.getCurFrag();
 		}
