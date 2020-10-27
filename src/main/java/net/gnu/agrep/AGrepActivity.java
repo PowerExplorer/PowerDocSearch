@@ -44,17 +44,17 @@ public class AGrepActivity extends StorageCheckActivity {
 	public int tabCount = 0;
     public int increaseTabNo = 0;
 	private int curIndex = -1;
-	private ClipboardManager mClipboard;
-	private FileWriter fw;
-	
-	private ClipboardManager.OnPrimaryClipChangedListener mPrimaryChangeListener
-			= new ClipboardManager.OnPrimaryClipChangedListener() {
-    		    public void onPrimaryClipChanged() {
-        		    updateClipData(true);
- 		       }
-	};
-
-	private boolean savingClipboard;
+//	private ClipboardManager mClipboard;
+//	private FileWriter fw;
+//	
+//	private ClipboardManager.OnPrimaryClipChangedListener mPrimaryChangeListener
+//			= new ClipboardManager.OnPrimaryClipChangedListener() {
+//    		    public void onPrimaryClipChanged() {
+//        		    updateClipData(true);
+// 		       }
+//	};
+//
+//	private boolean savingClipboard;
 
 	
     @Override
@@ -76,8 +76,8 @@ public class AGrepActivity extends StorageCheckActivity {
 			transaction.replace(R.id.content_fragment, slideFrag, "slideFrag");
 			transaction.commit();
         } 
-		mClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
-		mClipboard.addPrimaryClipChangedListener(mPrimaryChangeListener);
+//		mClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+//		mClipboard.addPrimaryClipChangedListener(mPrimaryChangeListener);
         
 	}
 	
@@ -187,7 +187,7 @@ public class AGrepActivity extends StorageCheckActivity {
 	protected void onDestroy() {
 		Log.d(TAG, "onDestroy");
 		super.onDestroy();
-		mClipboard.removePrimaryClipChangedListener(mPrimaryChangeListener);
+		//mClipboard.removePrimaryClipChangedListener(mPrimaryChangeListener);
 		
 	}
 
@@ -262,20 +262,20 @@ public class AGrepActivity extends StorageCheckActivity {
         if (item.getItemId() == R.id.menu_option) {
             Intent intent = new Intent(this, OptionActivity.class);
             startActivityForResult(intent, REQUEST_CODE_PREFS);
-        } else if (item.getItemId() == R.id.menu_save_clipboard) {
-			if (savingClipboard) {
-				savingClipboard = false;
-				fw = null;
-				item.setTitle("Start Saving Clipboard");
-			} else {
-				try {
-					fw = new FileWriter(SearcherAplication.PRIVATE_PATH + "/clipboard " + Util.DATETIME_FORMAT.format(Calendar.getInstance().getTime()).replaceAll("[/:\\*?<>|\"']", "_") + ".txt", true);
-					savingClipboard = true;
-					item.setTitle("Stop Saving Clipboard");
-				} catch (IOException e) {
-					Log.e(TAG, e.getMessage(), e);
-				}
-			}
+//        } else if (item.getItemId() == R.id.menu_save_clipboard) {
+//			if (savingClipboard) {
+//				savingClipboard = false;
+//				fw = null;
+//				item.setTitle("Start Saving Clipboard");
+//			} else {
+//				try {
+//					fw = new FileWriter(SearcherAplication.PRIVATE_PATH + "/clipboard " + Util.DATETIME_FORMAT.format(Calendar.getInstance().getTime()).replaceAll("[/:\\*?<>|\"']", "_") + ".txt", true);
+//					savingClipboard = true;
+//					item.setTitle("Stop Saving Clipboard");
+//				} catch (IOException e) {
+//					Log.e(TAG, e.getMessage(), e);
+//				}
+//			}
 		} else if (item.getItemId() == R.id.menu_clear_cache) {
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 			alert.setTitle("Clear Caching Files");
@@ -313,23 +313,23 @@ public class AGrepActivity extends StorageCheckActivity {
         return super.onOptionsItemSelected(item);
     }
 	
-	void updateClipData(boolean updateType) {
-        ClipData clip = mClipboard.getPrimaryClip();
-
-        if (clip != null) {
-            if (savingClipboard && fw != null) {
-				ClipData.Item item = clip.getItemAt(0);
-				CharSequence clipData = item.getText();
-				if (clipData != null && clipData.length() > 0) {
-					try {
-						fw.append(clipData + "\n");
-						fw.flush();
-					} catch (IOException e) {
-						Log.e(TAG, e.getMessage(), e);
-					}
-				}
-			}
-		}
-    }
+//	void updateClipData(boolean updateType) {
+//        ClipData clip = mClipboard.getPrimaryClip();
+//
+//        if (clip != null) {
+//            if (savingClipboard && fw != null) {
+//				ClipData.Item item = clip.getItemAt(0);
+//				CharSequence clipData = item.getText();
+//				if (clipData != null && clipData.length() > 0) {
+//					try {
+//						fw.append(clipData + "\n");
+//						fw.flush();
+//					} catch (IOException e) {
+//						Log.e(TAG, e.getMessage(), e);
+//					}
+//				}
+//			}
+//		}
+//    }
 
 }

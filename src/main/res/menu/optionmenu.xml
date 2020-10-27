@@ -11,11 +11,11 @@
 		android:id="@+id/menu_clear_cache"
 		android:alphabeticShortcut = "C"></item>
 	
-
+<!---
 	<item android:title="Save Clipboard"
 		android:id="@+id/menu_save_clipboard"
 		android:alphabeticShortcut = "S"></item>
-	
+	-->
 		
 		<!---
 	<item android:title="@string/help" android:id="@+id/help"
