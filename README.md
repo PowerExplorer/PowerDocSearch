@@ -7,5 +7,7 @@ Open Source
 https://github.com/PowerExplorer/PowerDocSearch/
 
 [<img src="https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190313.png">](https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190313.png)
+
 [<img src="https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190715.png">](https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190715.png)
+
 [<img src="https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190733.png">](https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190733.png)
