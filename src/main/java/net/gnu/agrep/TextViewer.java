@@ -73,7 +73,7 @@ public class TextViewer extends Activity implements OnItemLongClickListener , On
                     mPatternText = mPatternText.replaceAll(Util.SPECIAL_CHAR_PATTERNSTR, "\\\\$1");
                 }
 
-                setTitle(mPath + " - aGrep");
+                setTitle(mPath.substring(mPath.lastIndexOf("/")+1));
                 mTask = new TextLoadTask();
                 mTask.execute(mPath);
             } 

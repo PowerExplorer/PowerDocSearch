@@ -13,16 +13,16 @@
     <string name="grep_canceled">Canceled.</string>
 
     <string name="multiselect_title">Select multiple files</string>
-	<string name="pick_title">File picker</string>
+	<string name="pick_title">File and Folder Picker</string>
 
-	<string name="label_dir">Target Directories</string>
-    <string name="label_ext">Target Extensions</string>
+	<string name="label_dir">Files and Folders</string>
+    <string name="label_ext">Extensions</string>
     <string name="label_re">Regular Expression</string>
     <string name="label_ignore_case">Ignore Case</string>
     <string name="label_adddir">Add Directory</string>
     <string name="label_addext">Add Extension</string>
     <string name="label_hint">Search word</string>
-<string name="newfile">New File</string>
+	<string name="newfile">New File</string>
     <string name="nofiles">No Files</string>
    
     <string name="label_OK">OK</string>

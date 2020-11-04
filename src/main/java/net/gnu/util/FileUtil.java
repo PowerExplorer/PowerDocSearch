@@ -566,7 +566,7 @@ public class FileUtil {
 			final UniversalDetector detector = new UniversalDetector(
 				new CharsetListener() {
 					public void report(String name) {
-						Log.d(TAG, "detectCharset = " + name + ", " + file.getAbsolutePath());
+						//Log.d(TAG, "detectedCharset = " + name + ", " + file.getAbsolutePath());
 					}
 				}
 			);
@@ -626,6 +626,9 @@ public class FileUtil {
 				String str = new String(byteArr, 3, byteArr.length - 3, HtmlUtil.UTF8);//
 				Log.d(TAG, "is UTF8 1: " + filePath);
 				return str;
+			} else if (filePath.toLowerCase().endsWith(".pdf.txt")) {
+				Log.d(TAG, "not UTF8 use pdf String(byteArr): " + filePath);
+				return new String(byteArr);
 			} else {
 				String cs = detectCharset(new File(filePath));
 				String str;
@@ -641,14 +644,11 @@ public class FileUtil {
 				if (HtmlUtil.VU_TIMES.equals(fontName)
 					|| HtmlUtil.TIMES_CSX.equals(fontName)
 					|| HtmlUtil.TIMES_CSX_1.equals(fontName)) {
-					Log.d(TAG, "is UTF8 2: " + filePath);
+					Log.d(TAG, "is UTF8 convert font: " + filePath);
 					return str;
-				} else if (filePath.toLowerCase().contains(".pdf.")) {
-					Log.d(TAG, "is not UTF8: " + filePath + " pdf String(byteArr)");
-					return new String(byteArr);
 				} else {
 					String notUTF8 = new String(byteArr, ISO_8859_1);
-					Log.d(TAG, "is not UTF8: " + filePath + " txt String(byteArr, ISO_8859_1)");
+					Log.d(TAG, "not UTF8 use ISO_8859_1: " + filePath);
 					return notUTF8;
 				}
 			}

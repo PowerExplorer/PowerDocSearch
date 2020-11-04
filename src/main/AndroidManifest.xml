@@ -154,10 +154,10 @@
             </intent-filter>
 			-->
         </activity>
-        <activity android:name=".FileSelectorActivity"
+        <!--<activity android:name=".FileSelectorActivity"
 			android:configChanges="keyboardHidden|orientation"
 			android:label="@string/app_selector" >
-        </activity>
+        </activity>-->
         <activity android:name=".OptionActivity"
 			android:configChanges="keyboardHidden|orientation"
 			android:label="@string/label_option" >
