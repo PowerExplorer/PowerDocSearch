@@ -13,7 +13,7 @@
 	
 	<item android:title="Duplicate Finder" 
 		android:id="@+id/menu_duplicate_finder"
-		android:alphabeticShortcut = "S"></item>
+		android:alphabeticShortcut = "D"></item>
 	
 	<item android:title="Save Clipboard"
 		android:id="@+id/menu_save_clipboard"

@@ -22,26 +22,25 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 	private static final String TAG = "DuplicateFinderActivity";
 	private static final int DUP_REQUEST_CODE = 7;
 	
-	DupFinderTask dupTask = null;
+	private DupFinderTask dupTask;
 	static final MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
 	private DupAdapter srcAdapter;
 	private ImageThreadLoader imageLoader;
 	private LinkedList<List<FileInfo>> groupList;
 	private LinkedList<FileInfo> gList;
 	private LinkedList<FileInfo> selectedInList = new LinkedList<>();
-	private TextView statusView = null;
-	private ListView listView = null;
+	private TextView statusView;
+	private ListView listView;
 
-	TextView dupInfo;
+	private TextView dupInfo;
 	private ImageButton allMenu;
 	private TextView allGroup;
 	private TextView allName;
 	private TextView allDate;
 	private TextView allPath;
 	private TextView allType;
-	CharSequence status = "";
-	boolean showList = true;
-	boolean nameOrder = true;
+	private CharSequence status = "";
+	
 	private boolean groupViewChanged = false;
 	private ActionBar actionBar;
 	private List<String> fs = new LinkedList<>();
@@ -49,8 +48,8 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		Log.d(TAG, "onCreate " + savedInstanceState);
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.duplicate);
 		
 		actionBar = getActionBar();
@@ -137,7 +136,7 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 		if (groupList == null) {
 			groupList = (LinkedList<List<FileInfo>>) savedInstanceState.getSerializable("groupList");
 			gList = (LinkedList<FileInfo>) savedInstanceState.getSerializable("gList");
-			statusView.setText(status);
+			//statusView.setText(status);
 			groupViewChanged = savedInstanceState.getBoolean("groupViewChanged");
 			srcAdapter = new DupAdapter(this, R.layout.dup_list_item, gList, groupList);
 			listView.setAdapter(srcAdapter);
@@ -225,7 +224,7 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 	public void loadFiles(View view) {
 		//Log.d("dupFinder.previous selectedFiles", selectedFiles + ".");
 		Intent intent = new Intent(DuplicateFinderActivity.this, FolderChooserActivity.class);
-//		intent.putExtra(FolderChooserActivity.EXTRA_ABSOLUTE_PATH, selectedFiles);
+		intent.putExtra(FolderChooserActivity.EXTRA_ABSOLUTE_PATH, fs.toArray(new String[0]));
 //		intent.putExtra(FolderChooserActivity.EXTRA_FILTER_FILETYPE, ALL_SUFFIX);
 //		intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, MULTI_FILES);
 //		intent.putExtra(FolderChooserActivity.CHOOSER_TITLE, ALL_SUFFIX_TITLE);
@@ -1054,7 +1053,8 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 
 		private final TreeSet<ComparableEntry<String, String>> mimeMap = new TreeSet<>();
 		public void onClick(final View v) {
-			if (v.getId() == R.id.more) {
+			final int id = v.getId();
+			if (id == R.id.more) {
 				final FileInfo fileInfo = ((Holder) v.getTag()).fileInfo;
 				if (!fileInfo.file.exists()) {
 					showToast("\"" + fileInfo.path + "\" isn't exised");
@@ -1118,7 +1118,7 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 				if (!f.canRead()) {
 					showToast(f + " cannot be read");
 				} else {
-					if ((v instanceof CheckBox) || (v instanceof ImageView)) {//file and folder
+					if ((id == R.id.cbx) || (id == R.id.icon)) {//file and folder
 						if (selectedInList.contains(fPath)) {
 							selectedInList.remove(fPath);
 							v.setBackgroundColor(LIGHT_YELLOW);
@@ -1126,6 +1126,8 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 							selectedInList.add(fPath);
 							v.setBackgroundColor(LIGHT_BROWN);
 						}
+						status = selectedInList.size() + "/"+ getCount();
+						statusView.setText(status);
 					} else if (f.isFile()) { //file
 						try{
 							Uri uri = Uri.fromFile(f);

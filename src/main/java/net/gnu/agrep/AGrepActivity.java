@@ -271,7 +271,7 @@ public class AGrepActivity extends StorageCheckActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.optionmenu, menu);
 		if (!privateUse) {
-			menu.getItem(R.id.menu_save_clipboard).setVisible(false);
+			menu.findItem(R.id.menu_save_clipboard).setVisible(false);
 		}
         return true;
     }

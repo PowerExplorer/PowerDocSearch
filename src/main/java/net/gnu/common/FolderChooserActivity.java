@@ -297,6 +297,16 @@ public class FolderChooserActivity extends StorageCheckActivity implements View.
 			selectionStatus2.setText("0/" + dataSourceL2.size());
 			multiFiles = true;
 		}
+		final String[] arr = intent.getStringArrayExtra(EXTRA_ABSOLUTE_PATH);
+		final int itemCount = arr.length;
+		if (arr != null && itemCount > 0) {
+			dataSourceL2.clear();
+			for (String st : arr) {
+				dataSourceL2.add(new FileInfo(st));
+			}
+			selectionStatus2.setText("0/" + dataSourceL2.size());
+			multiFiles = true;
+		}
 		if (multiFiles && !Intent.ACTION_MAIN.equals(action)) {
 			destAdapter = new ArrayAdapter(this, R.layout.list_item, dataSourceL2);
 			listView2.setAdapter(destAdapter);

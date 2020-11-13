@@ -65,7 +65,7 @@ public class SettingsFragment extends Fragment implements GrepView.Callback {
 	+ ".list; .depend; .js; .jsp; .mk; .config; .configure;"
 	+ ".machine; .asm; .css; .desktop; .inc; .i; .ini; .plist;"
 	+ ".pro; .py; .php; .s; .xpm; .bak; .doc; .xls; .ppt; .pps "
-	+ ".pub; .vsd; .odt; .ods; .odp; .docx; .xlsx; .pptx;"
+	+ ".pub; .vsd; .odt; .ods; .odp; .docx; .xlsx; .pptx; "
 	
 	+ ".7z; .bz2; .bzip2; .tbz2; .tbz; .gz; .gzip; .tgz;"
 	+ ".tar; .swm; .xz; .txz; .zip; .zipx; .jar; .apk; .xpi;"
@@ -396,7 +396,14 @@ public class SettingsFragment extends Fragment implements GrepView.Callback {
 					
 					Intent intent = new Intent(mContext, FolderChooserActivity.class);
 					//Log.d("newSearch.oldselectedFiles", Util.arrayToString(selectedFiles, true, MainFragment.LINE_SEP));
-					intent.putExtra(FolderChooserActivity.EXTRA_ABSOLUTE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
+					String[] s = new String[mPrefs.mDirList.size()];
+					int i = 0;
+					if (s.length > 0) {
+						for (CheckedString cs : mPrefs.mDirList) {
+							s[i++] = cs.string;
+						}
+					} 
+					intent.putExtra(FolderChooserActivity.EXTRA_ABSOLUTE_PATH, s);//Environment.getExternalStorageDirectory().getAbsolutePath());
 					intent.putExtra(FolderChooserActivity.EXTRA_FILTER_FILETYPE, SEARCH_FILES_SUFFIX);
 					intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 					intent.putExtra(FolderChooserActivity.CHOOSER_TITLE, "Pick files/folder");
