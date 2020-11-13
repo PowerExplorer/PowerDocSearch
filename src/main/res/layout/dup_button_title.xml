@@ -17,12 +17,11 @@
 		android:layout_alignParentLeft="true"
 		android:layout_toLeftOf="@+id/cancelDir"
 		android:text="Duplicate Finder"
-		android:textColor="@color/lightyellow"
 		android:singleLine="true"
 		android:ellipsize="middle"
 		android:gravity="left|center_vertical"
 		android:layout_gravity="left|center_vertical"
-		android:textSize="20sp"
+		android:textSize="24sp"
 		android:textAppearance="?android:textAppearanceLarge"
 	/>
 	<ImageButton

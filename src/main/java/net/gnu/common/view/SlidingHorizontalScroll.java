@@ -182,19 +182,20 @@ public class SlidingHorizontalScroll extends HorizontalScrollView {
         textView.setTypeface(Typeface.DEFAULT_BOLD);
 		textView.setTextColor(0xffeeeeee);
 		
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            // If we're running on Honeycomb or newer, then we can use the Theme's
-            // selectableItemBackground to ensure that the View has a pressed state
-            TypedValue outValue = new TypedValue();
-            getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,
-                    outValue, true);
-            textView.setBackgroundResource(outValue.resourceId);
-        }
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-//            // If we're running on ICS or newer, enable all-caps to match the Action Bar tab style
-//            textView.setAllCaps(true);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+//            // If we're running on Honeycomb or newer, then we can use the Theme's
+//            // selectableItemBackground to ensure that the View has a pressed state
+//            TypedValue outValue = new TypedValue();
+//            getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,
+//                    outValue, true);
+//            textView.setBackgroundResource(outValue.resourceId);
+		textView.setBackgroundResource(R.drawable.ripple);
 //        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            // If we're running on ICS or newer, enable all-caps to match the Action Bar tab style
+            textView.setAllCaps(true);
+        }
 
         int padding = (int) (TAB_VIEW_PADDING_DIPS * getResources().getDisplayMetrics().density);
         textView.setPadding(padding, padding, padding, padding);
