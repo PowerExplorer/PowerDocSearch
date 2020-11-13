@@ -136,12 +136,12 @@
             </intent-filter>
 
         </activity>
-        
+        <!-- android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
+            -->
         <activity
             android:name="net.gnu.common.DuplicateFinderActivity"
             android:label="Duplicate Finder" 
-			android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
-            android:icon="@drawable/icon"
+			android:icon="@drawable/icon"
             android:launchMode="singleTask"
         >
 			<intent-filter>
