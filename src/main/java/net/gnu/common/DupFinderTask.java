@@ -21,6 +21,7 @@ public class DupFinderTask extends AsyncTask<Void, Object, CharSequence> {
 	private LinkedList<List<FileInfo>> groupList;
 	private DuplicateFinderActivity activity;
 	private List<String> fs;
+	private long start = System.nanoTime();
 	
 	public DupFinderTask(final DuplicateFinderActivity activity, final String... fileNames) {
 		this.activity = activity;
@@ -61,7 +62,7 @@ public class DupFinderTask extends AsyncTask<Void, Object, CharSequence> {
 	protected void onPostExecute(final CharSequence result) {
 		Log.d(TAG, result + "");
 		activity.showToast("Duplicate finder finished");
-		activity.setText("Duplicate finder finished");
+		activity.setText("Duplicate finder finished, took " + Util.nf.format(System.nanoTime() - start) + " ns");
 		if (groupList != null) {
 			activity.setDupList(groupList);
 		}

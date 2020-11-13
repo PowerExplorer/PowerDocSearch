@@ -19,11 +19,10 @@
 		android:paddingTop="4dp"
 		android:paddingRight="16dp"
 		android:paddingBottom="4dp"
-		android:textAppearance="?android:textAppearanceSmall"
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentRight="true"
 		android:layout_alignParentTop="true"
-		
+		android:textColor="#ff000000"
 	/>
 
 	<View
@@ -51,6 +50,7 @@
 			android:id="@+id/allGroup"
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
+			android:textColor="#ff000000"
 			android:onClick="group"
 			android:text="Group ▼" 
 			android:textSize="16sp"
@@ -78,6 +78,7 @@
 			android:layout_weight="23"
 			android:textSize="16sp"
 			android:textStyle="normal"
+			android:textColor="#ff000000"
 			android:paddingLeft="4dp"
 			android:paddingTop="0dp"
 			android:paddingRight="0dp"
@@ -85,7 +86,7 @@
 			android:gravity="left|center_vertical"
 			android:layout_gravity="left|center_vertical"
 			android:text="Name" 
-			android:textAppearance="?android:textAppearanceMedium" />
+			 />
 
 		<TextView
 			android:id="@+id/allType"
@@ -95,12 +96,13 @@
 			android:layout_height="match_parent"
 			android:textSize="16sp"
 			android:textStyle="normal"
+			android:textColor="#ff000000"
 			android:padding="0dp"
 			android:gravity="center"
 			android:layout_gravity="center"
 			android:layout_weight="22"
 			android:text="Type" 
-			android:textAppearance="?android:textAppearanceMedium" />
+			 />
 
 		<TextView
 			android:id="@+id/allDate"
@@ -110,12 +112,13 @@
 			android:layout_height="match_parent"
 			android:textSize="16sp"
 			android:textStyle="normal"
+			android:textColor="#ff000000"
 			android:padding="0dp"
 			android:gravity="center"
 			android:layout_gravity="center"
 			android:layout_weight="35"
 			android:text="Date"
-			android:textAppearance="?android:textAppearanceMedium"/>
+			/>
 
 		<TextView
 			android:id="@+id/allPath"
@@ -125,6 +128,7 @@
 			android:layout_height="match_parent"
 			android:textSize="16sp"
 			android:textStyle="normal"
+			android:textColor="#ff000000"
 			android:paddingLeft="0dp"
 			android:paddingTop="0dp"
 			android:paddingRight="4dp"
@@ -133,7 +137,7 @@
 			android:layout_gravity="right|center_vertical"
 			android:layout_weight="20"
 			android:text="Path   " 
-			android:textAppearance="?android:textAppearanceMedium"/>
+			/>
 	</LinearLayout>
 
 	<View
@@ -168,7 +172,7 @@
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentRight="true"
 		android:singleLine="true"
-		android:textAppearance="?android:attr/textAppearanceSmall"
+		
 		android:textColor="#ff000000"
 		android:paddingLeft="4dp"
 		android:textStyle="normal"

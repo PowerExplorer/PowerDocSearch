@@ -59,7 +59,7 @@
 		android:textSize="20sp"
 		android:textColor="@color/lightyellow"
 		android:singleLine="true"
-		android:src="@drawable/install" 
+		android:src="@drawable/ic_add" 
 		android:background="@drawable/ripple"
 		android:layout_margin="0dp" />
 

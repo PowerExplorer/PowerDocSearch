@@ -43,7 +43,7 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 	
 	private boolean groupViewChanged = false;
 	private ActionBar actionBar;
-	private List<String> fs = new LinkedList<>();
+	private ArrayList<String> fs = new ArrayList<>();
 	
 	
 	@Override
@@ -126,8 +126,9 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 		super.onSaveInstanceState(outState);
 		outState.putSerializable("groupList", groupList);
 		outState.putSerializable("gList", gList);
-		outState.putCharSequence("status", status);
+		outState.putCharSequence("status", statusView.getText());
 		outState.putBoolean("groupViewChanged", groupViewChanged);
+		outState.putStringArrayList("fs", fs);
 	}
 
 	@Override
@@ -136,14 +137,21 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 		if (groupList == null) {
 			groupList = (LinkedList<List<FileInfo>>) savedInstanceState.getSerializable("groupList");
 			gList = (LinkedList<FileInfo>) savedInstanceState.getSerializable("gList");
-			//statusView.setText(status);
 			groupViewChanged = savedInstanceState.getBoolean("groupViewChanged");
-			srcAdapter = new DupAdapter(this, R.layout.dup_list_item, gList, groupList);
-			listView.setAdapter(srcAdapter);
-			srcAdapter.notifyDataSetChanged();
-			srcAdapter.displayGroup(groupList);
+			status = savedInstanceState.getCharSequence("status");
+			statusView.setText(status);
+			fs = (ArrayList<String>)savedInstanceState.getStringArrayList("fs");
+			if (groupList != null) {
+				findViewById(R.id.titleBar).setVisibility(View.VISIBLE);
+				findViewById(R.id.horizontalDivider).setVisibility(View.VISIBLE);
+				findViewById(R.id.horizontalDivider2).setVisibility(View.VISIBLE);
+				srcAdapter = new DupAdapter(this, R.layout.dup_list_item, gList, groupList);
+				listView.setAdapter(srcAdapter);
+				srcAdapter.notifyDataSetChanged();
+				srcAdapter.displayGroup(groupList);
+			}
+			
 		}
-		
 	}
 	
 	
