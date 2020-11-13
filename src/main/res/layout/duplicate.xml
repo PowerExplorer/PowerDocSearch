@@ -163,13 +163,15 @@
 		android:id="@+id/statusView"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:visibility="visible"
 		android:layout_alignParentBottom="true"
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentRight="true"
 		android:singleLine="true"
 		android:textAppearance="?android:attr/textAppearanceSmall"
-		android:textColor="#00000000"
+		android:textColor="#ff000000"
 		android:paddingLeft="4dp"
 		android:textStyle="bold"
-		android:textSize="10sp" />
+		android:textSize="9sp"
+		android:background="@color/lightbrown" />
 </RelativeLayout>

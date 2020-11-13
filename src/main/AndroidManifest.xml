@@ -155,6 +155,17 @@
                 <data android:mimeType="*/*" />
 
 			</intent-filter>
+			
+			<intent-filter>
+				<action android:name="android.intent.action.SEND" />
+				<action android:name="android.intent.action.SENDTO" />
+				<action android:name="android.intent.action.SEND_MULTIPLE" />
+                <action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.OPENABLE"/>
+                <data android:scheme="file"/>
+			</intent-filter>
 		</activity>
 
 		<!--<activity android:name=".Search"

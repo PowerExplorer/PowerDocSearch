@@ -19,8 +19,7 @@ public class DupFinderTask extends AsyncTask<Void, Object, CharSequence> {
 
 	private static final String TAG = "DupFinderTask";
 	private LinkedList<List<FileInfo>> groupList;
-	private DuplicateFinderActivity frag;
-	private Activity activity;
+	private DuplicateFinderActivity activity;
 	private List<String> fs;
 	
 	public DupFinderTask(final DuplicateFinderActivity activity, final String... fileNames) {
@@ -54,28 +53,19 @@ public class DupFinderTask extends AsyncTask<Void, Object, CharSequence> {
 			for (Object cs : progress) {
 				sb.append(cs);
 			}
-			if (frag != null) {
-				frag.setText(sb);
-			} else {
-				((DuplicateFinderActivity)activity).setText(sb);
-			}
+			activity.setText(sb);
 		}
 	}
 
 	@Override
 	protected void onPostExecute(final CharSequence result) {
 		Log.d(TAG, result + "");
-		if (frag != null) {
-			frag.showToast("Duplicate finder finished");
-			if (groupList != null) {
-				frag.setDupList(groupList);
-			}
-		} else {
-			((DuplicateFinderActivity)activity).showToast("Duplicate finder finished");
-			if (groupList != null) {
-				((DuplicateFinderActivity)activity).setDupList(groupList);
-			}
+		activity.showToast("Duplicate finder finished");
+		activity.setText("Duplicate finder finished");
+		if (groupList != null) {
+			activity.setDupList(groupList);
 		}
+		
 	}
 
 	public CharSequence duplicateFinder(final List<String> files) throws IOException {

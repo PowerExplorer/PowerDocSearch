@@ -620,7 +620,7 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 			final FileInfo item = getItem(position);
 			final File f = item.file;
 			final String fileName = f.getName();
-			Log.d(TAG, "getView fileName " + fileName);
+			//Log.d(TAG, "getView fileName " + fileName);
 			final String fPath = f.getAbsolutePath();
 
 			holder.fileInfo = item;
@@ -997,21 +997,22 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 			i.setFlags(0x1b080001);
 
 			initMimemap();
-			i.setData(uri);
-			Log.d("i.setData(uri)", uri + "." + i);
 			String suff = net.gnu.util.FileUtil.getExtension(f);
 			ComparableEntry<String, String> comparableEntry = new ComparableEntry<String, String>(suff, "");
 			ComparableEntry<String, String> floor = null;
 			if ((floor = mimeMap.floor(comparableEntry)).equals(comparableEntry)) {
 				i.setDataAndType(uri, floor.value);
-				Log.d("floor", floor + ", " + i);
+				Log.d(TAG, "i.setDataAndType " + floor + ", " + i);
+			} else {
+				i.setData(uri);
+				Log.d(TAG, "i.setData(uri) " + uri + ", " + i);
 			}
 
-			Log.d("send", i + ".");
-			Log.d("send.getExtras()", AndroidUtils.bundleToString(i.getExtras()));
+			Log.d(TAG, "send" + i);
+			Log.d(TAG, "send.getExtras " + AndroidUtils.bundleToString(i.getExtras()));
 			Intent createChooser = Intent.createChooser(i, "Send via..");
-			Log.d("createChooser", createChooser + ".");
-			Log.d("createChooser.getExtras()", AndroidUtils.bundleToString(createChooser.getExtras()));
+			Log.d(TAG, "createChooser" + createChooser);
+			Log.d(TAG, "createChooser.getExtras " + AndroidUtils.bundleToString(createChooser.getExtras()));
 			startActivity(createChooser);
 			return true;
 		}
