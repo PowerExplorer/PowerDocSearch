@@ -14,3 +14,5 @@ https://github.com/PowerExplorer/PowerDocSearch/
 
 Duplicate Finder
 [<img src="https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201113-222211.png">](https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201113-222211.png)
+
+
