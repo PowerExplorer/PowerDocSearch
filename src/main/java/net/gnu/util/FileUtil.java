@@ -250,7 +250,7 @@ public class FileUtil {
 
 	public static Collection<File> getFilesAndFolder(final File f) {
 		Log.d(TAG, "getFilesAndFolder " + f.getAbsolutePath());
-		final List<File> fList = new LinkedList<File>();
+		final TreeSet<File> fList = new TreeSet<File>();
 		if (f != null) {
 			final LinkedList<File> folderQueue = new LinkedList<File>();
 			if (f.isDirectory()) {
@@ -292,7 +292,7 @@ public class FileUtil {
 		if (fs == null) {
 			return new LinkedList<File>();
 		}
-		final LinkedList<File> ret = new LinkedList<File>();
+		final Set<File> ret = new TreeSet<File>();
 		final LinkedList<File> folderQueue = new LinkedList<File>();
 		for (File f : fs) {
 			if (f.isFile()) {
@@ -319,7 +319,7 @@ public class FileUtil {
 
 	public static Collection<File> getFiles(final File f) {
 		//Log.d(TAG, "getFiles " + f.getAbsolutePath());
-		final List<File> fList = new LinkedList<File>();
+		final TreeSet<File> fList = new TreeSet<File>();
 		if (f != null) {
 			final LinkedList<File> folderQueue = new LinkedList<File>();
 			if (f.isDirectory()) {
@@ -346,7 +346,7 @@ public class FileUtil {
 		return fList;
 	}
 
-	public static List<File> getFiles(final String ff[], final Pattern includePattern, final Pattern excludePattern) {
+	public static Collection<File> getFiles(final String ff[], final Pattern includePattern, final Pattern excludePattern) {
 		File[] farr = null;
 		if (ff != null) {
 			farr = new File[ff.length];
@@ -358,7 +358,7 @@ public class FileUtil {
 		return getFiles(farr, includePattern, excludePattern);
 	}
 
-	public static List<File> getFiles(final File ff[], final Pattern includePattern, final Pattern excludePattern) {
+	public static Collection<File> getFiles(final File ff[], final Pattern includePattern, final Pattern excludePattern) {
 		if (ff != null) {
 			final Set<File> set = new TreeSet<File>();
 			for (File f : ff) {
@@ -373,7 +373,7 @@ public class FileUtil {
 	}
 
 	public static Collection<File> getFiles(final File ff, Pattern includePattern, Pattern excludePattern) {
-		final List<File> lf = new LinkedList<File>();
+		final TreeSet<File> lf = new TreeSet<File>();
 		if (ff != null) {
 			final LinkedList<File> folders = new LinkedList<File>();
 			if (includePattern == null || includePattern.pattern().trim().length() == 0) {
@@ -423,7 +423,7 @@ public class FileUtil {
 	}
 
 	public static Collection<File> getFilesBySuffix(final File ff, final String suffix, boolean includeFolder) {
-		final List<File> lf = new LinkedList<File>();
+		final TreeSet<File> lf = new TreeSet<File>();
 		if (ff != null) {
 			boolean isSuffixEmpty = Util.isEmpty(suffix);
 			String[] suffixes = null;

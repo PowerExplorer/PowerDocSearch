@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+	android:background="@color/lightyellow"
+    tools:context=".MainActivity" >
+
+	<TextView 
+		android:id="@+id/dupInfo"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:maxLines="4"
+		android:textSize="16sp"
+		android:paddingLeft="16dp"
+		android:paddingTop="4dp"
+		android:paddingRight="16dp"
+		android:paddingBottom="4dp"
+		android:textAppearance="?android:textAppearanceSmall"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentTop="true"
+		
+	/>
+
+	<View
+		android:id="@+id/horizontalDivider"
+		android:layout_width="match_parent"
+		android:layout_height="1dp"
+		android:visibility="gone"
+		android:background="?android:attr/dividerVertical"
+		android:layout_below="@+id/dupInfo"
+	/>
+
+	<LinearLayout
+		android:id="@+id/titleBar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:layout_gravity="center"
+		android:visibility="gone"
+		android:padding="0dp"
+		android:background="#FFFFE6D9"
+		android:layout_below="@+id/horizontalDivider"
+	>
+
+		<TextView
+			android:id="@+id/allGroup"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:onClick="group"
+			android:text="Group ▼" 
+			android:textSize="16sp"
+			android:gravity="center"
+			android:layout_gravity="center"
+			android:padding="0dp" />
+
+
+		<ImageButton
+			android:layout_width="36dp"
+			android:layout_height="wrap_content"
+			android:id="@+id/allMenu"
+			android:background="@drawable/ripple"
+			android:layout_centerVertical="true"
+			android:clickable="true"
+			android:layout_gravity="center"
+			android:src="@drawable/ic_more_vert_black_48dp"/>
+
+		<TextView
+			android:id="@+id/allName"
+			android:background="@drawable/ripple"
+			android:clickable="true"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="23"
+			android:textSize="16sp"
+			android:textStyle="normal"
+			android:paddingLeft="4dp"
+			android:paddingTop="0dp"
+			android:paddingRight="0dp"
+			android:paddingBottom="0dp"
+			android:gravity="left|center_vertical"
+			android:layout_gravity="left|center_vertical"
+			android:text="Name" 
+			android:textAppearance="?android:textAppearanceMedium" />
+
+		<TextView
+			android:id="@+id/allType"
+			android:background="@drawable/ripple"
+			android:clickable="true"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:textSize="16sp"
+			android:textStyle="normal"
+			android:padding="0dp"
+			android:gravity="center"
+			android:layout_gravity="center"
+			android:layout_weight="22"
+			android:text="Type" 
+			android:textAppearance="?android:textAppearanceMedium" />
+
+		<TextView
+			android:id="@+id/allDate"
+			android:background="@drawable/ripple"
+			android:clickable="true"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:textSize="16sp"
+			android:textStyle="normal"
+			android:padding="0dp"
+			android:gravity="center"
+			android:layout_gravity="center"
+			android:layout_weight="35"
+			android:text="Date"
+			android:textAppearance="?android:textAppearanceMedium"/>
+
+		<TextView
+			android:id="@+id/allPath"
+			android:background="@drawable/ripple"
+			android:clickable="true"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:textSize="16sp"
+			android:textStyle="normal"
+			android:paddingLeft="0dp"
+			android:paddingTop="0dp"
+			android:paddingRight="4dp"
+			android:paddingBottom="0dp"
+			android:gravity="right|center_vertical"
+			android:layout_gravity="right|center_vertical"
+			android:layout_weight="20"
+			android:text="Path   " 
+			android:textAppearance="?android:textAppearanceMedium"/>
+	</LinearLayout>
+
+	<View
+		android:id="@+id/horizontalDivider2"
+		android:layout_width="match_parent"
+		android:layout_height="1dp"
+		android:visibility="gone"
+		android:background="?android:attr/dividerVertical"
+		android:layout_below="@+id/titleBar"
+	/>
+
+	<ListView
+		android:id="@+id/files"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="2dp"
+		android:paddingTop="0dp"
+		android:paddingRight="2dp"
+		android:paddingBottom="0dp"
+		android:clickable="true"
+		android:longClickable="true" 
+		android:layout_above="@+id/statusView"
+		android:layout_below="@+id/horizontalDivider2"
+	/>
+
+	<TextView
+		android:id="@+id/statusView"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentRight="true"
+		android:singleLine="true"
+		android:textAppearance="?android:attr/textAppearanceSmall"
+		android:textColor="#00000000"
+		android:paddingLeft="4dp"
+		android:textStyle="bold"
+		android:textSize="10sp" />
+</RelativeLayout>

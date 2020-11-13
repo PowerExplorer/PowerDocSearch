@@ -31,6 +31,7 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import net.gnu.util.FileUtil;
 import android.app.AlertDialog;
+import net.gnu.common.*;
 
 public class AGrepActivity extends StorageCheckActivity {
 
@@ -45,17 +46,19 @@ public class AGrepActivity extends StorageCheckActivity {
     public int increaseTabNo = 0;
 	private int curIndex = -1;
 	
-//	private ClipboardManager mClipboard;
-//	private FileWriter fw;
-//	
-//	private ClipboardManager.OnPrimaryClipChangedListener mPrimaryChangeListener
-//			= new ClipboardManager.OnPrimaryClipChangedListener() {
-//    		    public void onPrimaryClipChanged() {
-//        		    updateClipData(true);
-// 		       }
-//	};
-//
-//	private boolean savingClipboard;
+	private ClipboardManager mClipboard;
+	private FileWriter fw;
+	
+	private ClipboardManager.OnPrimaryClipChangedListener mPrimaryChangeListener
+			= new ClipboardManager.OnPrimaryClipChangedListener() {
+    		    public void onPrimaryClipChanged() {
+        		    updateClipData(true);
+ 		       }
+	};
+
+	private boolean savingClipboard;
+
+	private boolean privateUse = false;
 
 	
     @Override
@@ -77,8 +80,8 @@ public class AGrepActivity extends StorageCheckActivity {
 			transaction.replace(R.id.content_fragment, slideFrag, "slideFrag");
 			transaction.commit();
         } 
-//		mClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
-//		mClipboard.addPrimaryClipChangedListener(mPrimaryChangeListener);
+		mClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+		mClipboard.addPrimaryClipChangedListener(mPrimaryChangeListener);
         
 	}
 	
@@ -91,6 +94,7 @@ public class AGrepActivity extends StorageCheckActivity {
 		
 		if (savedInstanceState == null) {
 			if (intent != null && intent.getData() != null) {
+				Log.d(TAG, "onPostCreate intent.data " + intent.getData());
 				slideFrag.addTab(intent);
 			} else {
 				final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
@@ -255,6 +259,7 @@ public class AGrepActivity extends StorageCheckActivity {
 
 	@Override
     protected void onNewIntent(Intent intent) {
+		Log.d(TAG, "onNewIntent " + intent);
         super.onNewIntent(intent);
 		if (intent != null && !Intent.ACTION_MAIN.equals(intent.getAction())) {
 			slideFrag.addTab(intent);
@@ -265,29 +270,36 @@ public class AGrepActivity extends StorageCheckActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.optionmenu, menu);
+		if (!privateUse) {
+			menu.getItem(R.id.menu_save_clipboard).setVisible(false);
+		}
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_option) {
+        int itemId = item.getItemId();
+		if (itemId == R.id.menu_option) {
             Intent intent = new Intent(this, OptionActivity.class);
             startActivityForResult(intent, REQUEST_CODE_PREFS);
-//        } else if (item.getItemId() == R.id.menu_save_clipboard) {
-//			if (savingClipboard) {
-//				savingClipboard = false;
-//				fw = null;
-//				item.setTitle("Start Saving Clipboard");
-//			} else {
-//				try {
-//					fw = new FileWriter(SearcherAplication.PRIVATE_PATH + "/clipboard " + Util.DATETIME_FORMAT.format(Calendar.getInstance().getTime()).replaceAll("[/:\\*?<>|\"']", "_") + ".txt", true);
-//					savingClipboard = true;
-//					item.setTitle("Stop Saving Clipboard");
-//				} catch (IOException e) {
-//					Log.e(TAG, e.getMessage(), e);
-//				}
-//			}
-		} else if (item.getItemId() == R.id.menu_clear_cache) {
+        } else if (itemId == R.id.menu_save_clipboard) {
+			if (savingClipboard) {
+				savingClipboard = false;
+				fw = null;
+				item.setTitle("Start Saving Clipboard");
+			} else {
+				try {
+					fw = new FileWriter(SearcherAplication.PRIVATE_PATH + "/clipboard " + Util.DATETIME_FORMAT.format(Calendar.getInstance().getTime()).replaceAll("[/:\\*?<>|\"']", "_") + ".txt", true);
+					savingClipboard = true;
+					item.setTitle("Stop Saving Clipboard");
+				} catch (IOException e) {
+					Log.e(TAG, e.getMessage(), e);
+				}
+			}
+		} else if (itemId == R.id.menu_duplicate_finder) {
+			Intent it = new Intent(this, DuplicateFinderActivity.class);
+			startActivity(it);
+		} else if (itemId == R.id.menu_clear_cache) {
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 			alert.setTitle("Clear Caching Files");
 			alert.setIconAttribute(android.R.attr.alertDialogIcon);
@@ -306,7 +318,7 @@ public class AGrepActivity extends StorageCheckActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						int num = FileUtil.deleteFiles(SearcherAplication.PRIVATE_DIR, true);
 						Log.d(TAG, "Clean cache" + num + " files deleted");
-						
+
 					}
 				});
 
@@ -324,23 +336,23 @@ public class AGrepActivity extends StorageCheckActivity {
         return super.onOptionsItemSelected(item);
     }
 	
-//	void updateClipData(boolean updateType) {
-//        ClipData clip = mClipboard.getPrimaryClip();
-//
-//        if (clip != null) {
-//            if (savingClipboard && fw != null) {
-//				ClipData.Item item = clip.getItemAt(0);
-//				CharSequence clipData = item.getText();
-//				if (clipData != null && clipData.length() > 0) {
-//					try {
-//						fw.append(clipData + "\n");
-//						fw.flush();
-//					} catch (IOException e) {
-//						Log.e(TAG, e.getMessage(), e);
-//					}
-//				}
-//			}
-//		}
-//    }
+	void updateClipData(boolean updateType) {
+        ClipData clip = mClipboard.getPrimaryClip();
+
+        if (clip != null) {
+            if (savingClipboard && fw != null) {
+				ClipData.Item item = clip.getItemAt(0);
+				CharSequence clipData = item.getText();
+				if (clipData != null && clipData.length() > 0) {
+					try {
+						fw.append(clipData + "\n");
+						fw.flush();
+					} catch (IOException e) {
+						Log.e(TAG, e.getMessage(), e);
+					}
+				}
+			}
+		}
+    }
 
 }
