@@ -334,10 +334,10 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 		return true;
 	}
 
-	final Pattern htmlPat = Pattern.compile("(htm|html|xhtml|shtm|shtml)");
-	final Pattern plainPat = Pattern.compile("(ini|mk|md|list|config|configure|js|bat|sh|lua|depend|java|c|cpp|h|hpp|jsp|machine|asm|css|desktop|inc|i|plist|pro|py|s|xpm|php|gradle)");
-	final Pattern zipPat = Pattern.compile("(zip|gz|7z|bz2|jar|tar|rar|arj|lzh|chm|xz|z)");
-	long totalSelectedSize;
+	private final Pattern htmlPat = Pattern.compile("(htm|html|xhtml|shtm|shtml)");
+	//private final Pattern plainPat = Pattern.compile("(txt|ini|mk|md|list|config|configure|js|bat|sh|lua|depend|java|c|cpp|h|hpp|jsp|machine|asm|css|desktop|inc|i|plist|pro|py|s|xpm|php|gradle)");
+	private final Pattern zipPat = Pattern.compile("(zip|gz|7z|bz2|jar|tar|rar|arj|lzh|chm|xz|z)");
+	private long totalSelectedSize;
 
 	private boolean convert(final File inFile) throws IOException, Exception {
 		//Log.d(TAG, "convert " + inFile);
@@ -372,10 +372,6 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 			publishProgress("adding converted text " + inFilePath);
 			retainFrag.fileList.add(inFile);
 			// file txt được chọn có thể đã được convert từ trước nhưng đã cũ
-		} else if (plainPat.matcher(ext).matches()) {
-			publishProgress("converting " + inFilePath);
-			fileContent = FileUtil.readFileWithCheckEncode(inFilePath);
-			fileContent = HtmlUtil.changeToVUTimes(fileContent);
 		} else if (ext.equals("pdf")) {
 			publishProgress("converting " + inFilePath);
 			final String pdfTextPath = SearcherAplication.PRIVATE_PATH + inFilePath + ".txt";
@@ -552,7 +548,11 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 				Log.d("GetSourceFileTask", "zis.close()");
 				extractFile.close();
 			}
-		}
+		} else {//}if (plainPat.matcher(ext).matches()) {
+			publishProgress("converting " + inFilePath);
+			fileContent = FileUtil.readFileWithCheckEncode(inFilePath);
+			fileContent = HtmlUtil.changeToVUTimes(fileContent);
+		} 
 		if (fileContent != null && fileContent.length() > 0) {
 			FileUtil.writeFileAsCharset(newFile, fileContent, HtmlUtil.UTF8);
 			retainFrag.fileList.add(newFile);
