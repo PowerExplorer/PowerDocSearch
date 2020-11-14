@@ -8,14 +8,15 @@ This is a local document seach app. It does not collect any private information.
 Open Source
 [URL="https://github.com/PowerExplorer/PowerDocSearch/"]https://github.com/PowerExplorer/PowerDocSearch/[/URL]
 
-Download [URL="https://github.com/PowerExplorer/PowerDocSearch/releases/download/V1.0.2.6/Power.DocSearch_1.0.2.6.apk"]PowerDocSearch_1.0.2.6.apk[/URL]
+Download [URL="https://github.com/PowerExplorer/PowerDocSearch/releases/download/V1.0.2.7/PowerDocSearch_1.0.2.7.apk"]PowerDocSearch_1.0.2.7.apk[/URL]
 
-[IMG="First screen"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190313.png[/IMG]
+[IMG="First screen"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/1.png[/IMG]
 
-[IMG="List results"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190715.png[/IMG]
+[IMG="List results"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/2.png[/IMG]
 
-[IMG="open file"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201025-190733.png[/IMG]
+[IMG="open file"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/3.png[/IMG]
 
 Duplicate Finder
-[IMG="Duplicate Finder"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/Screenshot_20201113-222211.png[/IMG]
+[IMG="Duplicate Finder"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/4.png[/IMG]
 
+[IMG="Duplicate Finder"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/5.png[/IMG]
