@@ -39,7 +39,6 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 	private TextView allDate;
 	private TextView allPath;
 	private TextView allType;
-	private CharSequence status = "";
 	
 	private boolean groupViewChanged = false;
 	private ActionBar actionBar;
@@ -89,6 +88,10 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 	protected void onNewIntent(final Intent intent) {
 		Log.d(TAG, "onNewIntent " + intent);
 		super.onNewIntent(intent);
+		if (dupTask != null) {
+			dupTask.cancel(true);
+		}
+		fs.clear();
 		final int oldSize = fs.size();
 		final Uri dataString = intent.getData();
 		Log.d(TAG, "intent.data=" + dataString);
@@ -138,8 +141,7 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 			groupList = (LinkedList<List<FileInfo>>) savedInstanceState.getSerializable("groupList");
 			gList = (LinkedList<FileInfo>) savedInstanceState.getSerializable("gList");
 			groupViewChanged = savedInstanceState.getBoolean("groupViewChanged");
-			status = savedInstanceState.getCharSequence("status");
-			statusView.setText(status);
+			statusView.setText(savedInstanceState.getCharSequence("status"));
 			fs = (ArrayList<String>)savedInstanceState.getStringArrayList("fs");
 			if (groupList != null) {
 				findViewById(R.id.titleBar).setVisibility(View.VISIBLE);
@@ -202,6 +204,9 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 		if (requestCode == DUP_REQUEST_CODE) {
 			if (data != null) {
 				if (resultCode == Activity.RESULT_OK) {
+					if (dupTask != null) {
+						dupTask.cancel(true);
+					}
 					String[] stringExtra = data.getStringArrayExtra(FolderChooserActivity.EXTRA_ABSOLUTE_PATH);
 					Log.d("DUP_REQUEST_CODE.selectedFiles", Util.arrayToString(stringExtra, true, "\n"));
 					fs = new ArrayList<>(stringExtra.length);
@@ -1135,8 +1140,7 @@ public class DuplicateFinderActivity extends Activity implements View.OnClickLis
 							selectedInList.add(fPath);
 							v.setBackgroundColor(LIGHT_BROWN);
 						}
-						status = selectedInList.size() + "/"+ getCount();
-						statusView.setText(status);
+						statusView.setText(selectedInList.size() + "/"+ getCount());
 					} else if (f.isFile()) { //file
 						try{
 							Uri uri = Uri.fromFile(f);

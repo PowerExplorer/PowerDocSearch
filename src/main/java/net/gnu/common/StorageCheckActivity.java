@@ -25,6 +25,7 @@ import eu.chainfire.libsuperuser.Shell;
 import net.gnu.agrep.R;
 import net.gnu.common.StorageCheckActivity;
 import net.gnu.util.ComparableEntry;
+import net.gnu.androidutil.*;
 
 //app must set targetSdkVersion 23 or above
 public class StorageCheckActivity extends FragmentActivity {
@@ -133,19 +134,6 @@ public class StorageCheckActivity extends FragmentActivity {
 	protected void onResume() {
 		super.onResume();
 	}
-
-//	@Override
-//	protected void onPostResume() {
-//		super.onPostResume();
-//		if (AndroidUtils.getSharedPreference(this, "URI", null) == null) {
-//			String[] s = AndroidFileUtil.getExtSdCardPaths(this);
-//			MainActivityHelper h = new MainActivityHelper(this);
-//			for (String ss : s) {
-//				h.checkFolder(new File(ss), this);
-//			}
-//		}
-//		
-//	}
 	
 	
 
@@ -223,7 +211,7 @@ public class StorageCheckActivity extends FragmentActivity {
 				Log.d(TAG, "treeUri " + treeUri);
 				// Persist URI - this is required for verification of writability.
 				if (treeUri != null) 
-					sharedPref.edit().putString("URI", treeUri.toString()).commit();
+					sharedPref.edit().putString("treeUri", treeUri.toString()).commit();
 			} else {
 				// If not confirmed SAF, or if still not writable, then revert settings.
 				/* DialogUtil.displayError(getActivity(), R.string.message_dialog_cannot_write_to_folder_saf, false, currentFolder);
@@ -410,7 +398,7 @@ public class StorageCheckActivity extends FragmentActivity {
 		 * @param file the file to be deleted.
 		 * @return True if successfully deleted.
 		 */
-		static boolean deleteFile(@NonNull final File file, Context context) {
+		public static boolean deleteFile(@NonNull final File file, Context context) {
 			// First try the normal deletion.
 			if (file == null) return true;
 			boolean fileDelete = deleteFilesInFolder(file, context);
@@ -447,7 +435,7 @@ public class StorageCheckActivity extends FragmentActivity {
 		 * @param folder the folder
 		 * @return true if successful.
 		 */
-		private static final boolean deleteFilesInFolder(final File folder, Context context) {
+		public static final boolean deleteFilesInFolder(final File folder, Context context) {
 			boolean totalSuccess = true;
 			if (folder == null)
 				return false;
@@ -497,7 +485,7 @@ public class StorageCheckActivity extends FragmentActivity {
 				originalDirectory = true;
 				//continue
 			}
-			String as = PreferenceManager.getDefaultSharedPreferences(context).getString("URI", null);
+			String as = PreferenceManager.getDefaultSharedPreferences(context).getString("treeUri", null);
 
 			Uri treeUri = null;
 			if (as != null) 
@@ -583,7 +571,7 @@ public class StorageCheckActivity extends FragmentActivity {
 		 * null is returned.
 		 */
 		@TargetApi(Build.VERSION_CODES.KITKAT)
-		private static String getExtSdCardFolder(final File file, Context context) {
+		public static String getExtSdCardFolder(final File file, Context context) {
 			final String[] extSdPaths = getExtSdCardPaths(context);
 			Log.d("FileUtil", "getExtSdCardFolder " + extSdPaths);
 			try {
@@ -605,7 +593,7 @@ public class StorageCheckActivity extends FragmentActivity {
 		 * @return A list of external SD card paths.
 		 */
 		@TargetApi(Build.VERSION_CODES.KITKAT)
-		private static String[] getExtSdCardPaths(Context context) {
+		public static String[] getExtSdCardPaths(Context context) {
 			List<String> paths = new ArrayList<>();
 			for (File file : context.getExternalFilesDirs("external")) {
 				Log.d("FileUtil", "getExtSdCardPaths.file " + file);

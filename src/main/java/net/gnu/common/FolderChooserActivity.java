@@ -701,6 +701,19 @@ public class FolderChooserActivity extends StorageCheckActivity implements View.
 		}
     }
 
+	@Override
+	protected void onPostResume() {
+		super.onPostResume();
+		if (AndroidUtils.getSharedPreference(this, "treeUri", null) == null) {
+			String[] s = StorageCheckActivity.AndroidFileUtil.getExtSdCardPaths(this);
+			MainActivityHelper h = new MainActivityHelper(this);
+			for (String ss : s) {
+				h.checkFolder(new File(ss), this);
+			}
+		}
+
+	}
+
 	private static final long TIME_INTERVAL = 250000000L;
 	private long mBackPressed = System.nanoTime();
 	@Override
