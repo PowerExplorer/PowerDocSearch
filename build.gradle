@@ -8,8 +8,8 @@ android {
         applicationId "net.gnu.agrep"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 4
-        versionName "1.0.2.6"
+        versionCode 7
+        versionName "1.0.2.7"
         multiDexEnabled true
     }
     buildTypes {
