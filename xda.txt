@@ -8,7 +8,7 @@ This is a local document seach app. It does not collect any private information.
 Open Source
 [URL="https://github.com/PowerExplorer/PowerDocSearch/"]https://github.com/PowerExplorer/PowerDocSearch/[/URL]
 
-Download [URL="https://github.com/PowerExplorer/PowerDocSearch/releases/download/V1.0.2.7/PowerDocSearch_1.0.2.7.apk"]PowerDocSearch_1.0.2.7.apk[/URL]
+Download [URL="https://github.com/PowerExplorer/PowerDocSearch/releases/download/v1.0.2.7/PowerDocSearch_1.0.2.7.apk"]PowerDocSearch_1.0.2.7.apk[/URL]
 
 [IMG="First screen"]https://github.com/PowerExplorer/PowerDocSearch/raw/main/Screenshot/1.png[/IMG]
 

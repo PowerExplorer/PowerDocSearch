@@ -735,14 +735,14 @@ public class AndroidUtils {
 			String newDest = dest + "/" + src;
 			File file = new File(newDest);
 			if (!file.exists()) {
-				Log.d("copyAssetToDir", newDest);
+				Log.d(TAG, "copyAssetToDir " + newDest);
 				InputStream ins = activity.getAssets().open(src);
 				FileUtil.is2File(ins, newDest);
 			} else {
-				System.out.println("already existed" + newDest);
+				Log.d(TAG, "already existed " + newDest);
 			}
 		} catch (Exception e) {
-			Log.e("copyAssetToDir", e.getMessage(), e);
+			Log.e(TAG, e.getMessage(), e);
 		}
 	}
 

@@ -31,13 +31,28 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import net.gnu.util.FileUtil;
 import android.app.AlertDialog;
-import net.gnu.common.*;
+import net.gnu.common.ExpandableListAdapter;
+import net.gnu.util.*;
+import net.gnu.androidutil.*;
+import android.widget.ListView;
+import android.widget.ArrayAdapter;
+import net.gnu.common.DuplicateFinderActivity;
+import android.os.*;
+import android.support.v4.app.*;
+import android.*;
+import android.content.pm.*;
+import android.support.annotation.*;
+import android.view.*;
+import android.widget.*;
+import android.webkit.*;
+import java.io.*;
 
 public class AGrepActivity extends StorageCheckActivity {
 
     private static final String TAG = "AGrepActivity";
 	final static int REQUEST_CODE_PREFS = 0x1002;
-    public SlidingTabsFragment slideFrag;
+    
+	public SlidingTabsFragment slideFrag;
 	private FragmentManager supportFragmentManager;
 	public SettingsFragment main;
 
@@ -265,6 +280,162 @@ public class AGrepActivity extends StorageCheckActivity {
 			slideFrag.addTab(intent);
 		}
 	}
+
+	protected static String[] PERMISSIONS_READ_PHONE_STATE = {
+		Manifest.permission.READ_PHONE_STATE
+	};
+	protected static final int REQUEST_READ_PHONE_STATE = 777;
+	
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+		Log.d(TAG, "onRequestPermissionsResult " + requestCode + ", " + grantResults.length + ", " + grantResults);
+		if (requestCode == REQUEST_READ_PHONE_STATE) {
+            //if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getSystemFeatures();
+            //} else {
+            //    Toast.makeText(this, R.string.grantfailed, Toast.LENGTH_SHORT).show();
+            //    requestStoragePermission();
+            //}
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+	
+    protected void requestReadPhoneStatePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+																Manifest.permission.READ_PHONE_STATE)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example, if the request has been denied previously.
+
+			Log.d(TAG, "shouldShowRequestPermissionRationale");
+
+//			new AlertDialog.Builder(this).setTitle(R.string.grantper).setMessage(getString(R.string.granttext))
+//				.setPositiveButton(R.string.grant,
+//				new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int which) {
+//						dialog.dismiss();
+						ActivityCompat.requestPermissions(AGrepActivity.this, 
+														  PERMISSIONS_READ_PHONE_STATE, 
+														  REQUEST_READ_PHONE_STATE);
+//					}
+//				})
+//				.setNegativeButton(R.string.cancel,
+//				new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int which) {
+//						dialog.dismiss();
+//						finish();
+//					}
+//				}).show();
+        } else {
+            // Contact permissions have not been granted yet. Request them directly.
+            Log.d(TAG, "requestStoragePermission.requestPermissions");
+            ActivityCompat.requestPermissions(this, PERMISSIONS_READ_PHONE_STATE, REQUEST_READ_PHONE_STATE);
+        }
+    }
+	public boolean checkReadPhoneStatePermission() {
+        // Verify that all required contact permissions have been granted.
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+			== PackageManager.PERMISSION_GRANTED
+			;
+    }
+	public boolean systemFeatures(MenuItem item) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkStorage) {
+            if (!checkReadPhoneStatePermission()) {
+                requestReadPhoneStatePermission();
+			} else {
+				getSystemFeatures();
+			}
+		} else {
+			getSystemFeatures();
+		}
+		return true;
+	}
+
+	private void getSystemFeatures() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		ListView tv = new ListView(this);
+		List<CharSequence> features = SystemUtils.getBuild();
+		features.addAll(Util.propertiesToListString(System.getProperties()));
+		features.addAll(Util.propertiesToListString(System.getenv()));
+		List<CharSequence> hardwareInfo = SystemUtils.getHardwareInfo(this);
+		hardwareInfo.add(0, "Hardware Info\n");
+		features.addAll(hardwareInfo);
+		features.add(CommandUtils.fetch_cpu_info().insert(0, "CPU Info\n"));
+		features.add(CommandUtils.fetch_disk_info().insert(0, "Disk Info\n"));
+		features.add(CommandUtils.fetch_mount_info().insert(0, "Mount Info\n"));
+		features.add(CommandUtils.fetch_netcfg_info().insert(0, "NetCfg Info\n"));
+		features.add(CommandUtils.fetch_netstat_info().insert(0, "NetStat Info\n"));
+		features.add(CommandUtils.fetch_process_info().insert(0, "Process Info\n"));
+		features.add("Tel Status\n" + SystemUtils.fetch_tel_status(this));
+
+		ArrayAdapter<CharSequence> arrayAdapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_list_item_1, features);
+		tv.setAdapter(arrayAdapter);
+
+		alert.setIconAttribute(android.R.attr.dialogIcon);
+		alert.setTitle("System Features List");
+
+		alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+		alert.setView(tv);
+		AlertDialog alertDialog = alert.create();
+		alertDialog.show();
+	}
+	
+	public boolean sensors(MenuItem item) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		ListView tv = new ListView(this);
+		List<CharSequence>[] sensors = SystemUtils.getSensors(this);
+		List<CharSequence>[] systemService = SystemUtils.getSystemService(this);
+		sensors[0].addAll(systemService[0]);
+		sensors[1].addAll(systemService[1]);
+		//Log.d("sensors[0]", CommonUtils.collectionToString(sensors[0], true, "\n"));
+		//Log.d("sensors[1]", CommonUtils.collectionToString(sensors[1], true, "\n"));
+		ExpandableListAdapter arrayAdapter = new ExpandableListAdapter(this, sensors[0], sensors[1], null);
+		tv.setAdapter(arrayAdapter);
+		//arrayAdapter.notifyDataSetChanged();
+		
+		alert.setIconAttribute(android.R.attr.dialogIcon);
+		alert.setTitle("Sensor List");
+		//alert.setCancelable(true);
+		alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+		alert.setView(tv);
+		AlertDialog alertDialog = alert.create();
+		alertDialog.show();
+		return true;
+	}
+	
+	public boolean about(MenuItem item) {
+		AndroidUtils.copyAssetToDir(this, SearcherAplication.PRIVATE_PATH, "lic.html"); 
+
+		final WebView wv = new WebView(this);
+		wv.loadUrl(new File(SearcherAplication.PRIVATE_PATH + "/lic.html").toURI().toString());
+		wv.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+		AlertDialog dialog = new AlertDialog.Builder(this)
+			.setIcon(R.drawable.icon)
+			.setIconAttribute(android.R.attr.dialogIcon)
+			.setTitle("Power DocSearch")
+			.setView(wv)
+			.setPositiveButton(R.string.ok,
+			new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					dialog.dismiss();
+				}
+			}).create();
+		dialog.show();
+		return true;
+	}
+	
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
