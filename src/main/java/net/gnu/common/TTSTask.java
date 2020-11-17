@@ -26,15 +26,15 @@ import net.gnu.agrep.RetainFrag;
 import net.gnu.agrep.R;
 
 public class TTSTask extends AsyncTask<Object, String, String> {
-	
+
 	private static  final String TAG = "TTSTask";
-	
+
 	private TTSActivity ttsActivity;
 	final RetainFrag retainFrag;
 	private TreeSet<File> lf;
 	final Bundle myBundleAlarm = new Bundle();
 	final HashMap<String, String> myHashAlarm = new HashMap<String, String>();
-	
+
 	public TTSTask(final TTSActivity ttsActivity, final RetainFrag retainFrag) {
 		this.ttsActivity = ttsActivity;
 		this.retainFrag = retainFrag;
@@ -63,7 +63,7 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 //			if (ttsFrag.text.trim().length() > 0) {
 //				Toast.makeText(activity, ttsFrag.text, Toast.LENGTH_SHORT).show();
 //			}
-			
+
 			//tts.speak(textET.getText().toString(), TextToSpeech.QUEUE_FLUSH, myHashAlarm);
 			Log.i(TAG, "isSpeaking " + ttsActivity.tts.isSpeaking());
 			String outputFile = "";
@@ -88,11 +88,11 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 							Log.i(TAG, "tts onError " + p1);
 						}
 					});
-				
-				myBundleAlarm.putCharSequence(TextToSpeech.Engine.KEY_PARAM_STREAM,
-											  String.valueOf(AudioManager.STREAM_MUSIC));
+
+				myBundleAlarm.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM,
+									 AudioManager.STREAM_MUSIC);
 				myBundleAlarm.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME,
-								(float)ttsActivity.volBar.getProgress()/15);
+									   (float)ttsActivity.volBar.getProgress()/15);
 				AudioAttributes audioAttributes = 
 					new AudioAttributes.Builder()
 					.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -107,7 +107,7 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 
 						}
 					});
-				
+
 				myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM,
 								String.valueOf(AudioManager.STREAM_MUSIC));
 				myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_VOLUME,
@@ -117,25 +117,25 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 				for (File ss : lf) {
 					if (TTSActivity.cancel) 
 						break;
-					String srcPath = ss.getAbsolutePath();
+					final String srcPath = ss.getAbsolutePath();
 					String pTemp = srcPath;
-					if (srcPath.lastIndexOf("/") > SearcherAplication.PRIVATE_PATH.length()) {
-						int ind = srcPath.indexOf(SearcherAplication.PRIVATE_PATH);
-						ind = (ind == -1) ? 0 : ind;
-						pTemp = srcPath.substring(0, ind) + srcPath.substring(ind + SearcherAplication.PRIVATE_PATH.length());
+					if (srcPath.startsWith(SearcherAplication.PRIVATE_PATH)) {//}.lastIndexOf("/") > SearcherAplication.PRIVATE_PATH.length()) {
+						//int ind = srcPath.indexOf(SearcherAplication.PRIVATE_PATH);
+						//ind = (ind == -1) ? 0 : ind;
+						pTemp = srcPath.substring(SearcherAplication.PRIVATE_PATH.length());
 					}
-					Log.i(TAG, "srcPath " + srcPath);
+					Log.i(TAG, "srcPath " + srcPath + ", pTemp " + pTemp);
 					File file = new File(ttsActivity.saveTo);
 					if (file.exists() && file.isDirectory()) {
 						outputFile = ttsActivity.saveTo + pTemp;
 					} else {
-						outputFile = SearcherAplication.PRIVATE_PATH + "/" + pTemp;
+						outputFile = SearcherAplication.PRIVATE_PATH + pTemp;
 					}
 					File oF = new File(outputFile);
 					if (!oF.getParentFile().exists()) {
 						oF.getParentFile().mkdirs();
 					}
-					Log.i(TAG, "tts outputFile" + outputFile);
+					Log.i(TAG, "tts outputFile " + outputFile);
 
 					RandomAccessFile f = new RandomAccessFile(new File(srcPath), "r");
 					publishProgress(ss.getAbsolutePath() + ": " + Util.nf.format(ss.length()) + " bytes");
@@ -184,7 +184,7 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 						substring = Util.replace(substring, replaces, bys, ttsActivity.isRegex, ttsActivity.caseSensitive);
 						if (ttsActivity.toWav && !ttsActivity.cancel) {
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-								ttsActivity.tts.synthesizeToFile(substring, myBundleAlarm, new File(outputFile), outputFile + ".wav");
+								ttsActivity.tts.synthesizeToFile(substring, myBundleAlarm, new File(outputFile + ".wav"), outputFile + ".wav");
 							} else {
 								ttsActivity.tts.synthesizeToFile(substring, myHashAlarm, outputFile + "-" + nf.format(no) + ".wav");
 							}
@@ -236,6 +236,7 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 
 					} else {
 						byte[] readFileToMemory = FileUtil.readFileToMemory(ss);
+						Log.i(TAG, "tts2 readFileToMemory " + ss.getAbsolutePath() + ", len " + ss.length());
 						String substring = new String(readFileToMemory, 3, readFileToMemory.length - 3, "utf-8");
 						Log.i(TAG, "tts2 toSpeak " + substring.length() + ", " + substring.getBytes().length);
 						String[] replaces = ttsActivity.replaceET.getText().toString().split("\r?\n");
@@ -251,11 +252,11 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 					}
 					f.close();
 				}
-				if (!ttsActivity.cancel) {
-					curPartNo = -1;
-					curPath = null;
-					ttsActivity.offset = -1;
-				}
+			}
+			if (!ttsActivity.cancel) {
+				curPartNo = -1;
+				curPath = null;
+				ttsActivity.offset = -1;
 			}
 		} catch (Throwable e) {
 			publishProgress(e.getMessage());
@@ -274,9 +275,9 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 		}
 		return "";
 	}
-	
+
 	Pattern pat = Pattern.compile(".+?[\\.!?,;:\n]+");
-	public void speak(final TTSActivity ttsFrag, final String substring, final Bundle myBundleAlarm, final HashMap<String, String> myHashAlarm, final String id, final int dotPause, final int paraPause,
+	public void speak(final TTSActivity ttsFrag, final String substring, final Bundle myBundleAlarm, final HashMap<String, String> myHashAlarm, final String utteranceId, final int dotPause, final int paraPause,
 					  int curOffset) {
 		Log.i(TAG, "substring offset2 " + curOffset + " " + substring);
 		final Matcher mat = pat.matcher(substring);
@@ -290,7 +291,7 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
 				ttsFrag.tts.speak(group, TextToSpeech.QUEUE_ADD, myHashAlarm);
 			} else {
-				ttsFrag.tts.speak(group, TextToSpeech.QUEUE_ADD, myBundleAlarm, id);
+				ttsFrag.tts.speak(group, TextToSpeech.QUEUE_ADD, myBundleAlarm, utteranceId);
 			}
 
 			try {
@@ -318,7 +319,7 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
 				ttsFrag.tts.speak(substring2, TextToSpeech.QUEUE_ADD, myHashAlarm);
 			} else {
-				ttsFrag.tts.speak(substring2, TextToSpeech.QUEUE_ADD, myBundleAlarm, id);
+				ttsFrag.tts.speak(substring2, TextToSpeech.QUEUE_ADD, myBundleAlarm, utteranceId);
 			}
 		}
 		Log.e(TAG, "offset end " + ttsFrag.offset);
@@ -327,7 +328,7 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 		}
 		Log.e(TAG, "offset end2 " + ttsFrag.offset);
 	}
-	
+
 	public static List<ComparableEntry<Integer, Integer>> split(byte[] f, int sizeOfPart) {
 		int length = f.length;
 		int written = 0;
@@ -413,11 +414,11 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 		}
 
 	}
-	
+
 	public void publishProgress(String st) {
 		super.publishProgress(st);
 	}
-	
+
 	protected void onProgressUpdate(String... progress) {
 		if (progress != null && progress.length > 0 
 			&& progress[0] != null && progress[0].length() > 0) {
@@ -436,6 +437,6 @@ public class TTSTask extends AsyncTask<Object, String, String> {
 			ttsActivity.startBtn.setImageResource(R.drawable.exo_controls_play);
 			ttsActivity.startBtn.setTag("Play");
 		}
-		
+
 	}
 }
