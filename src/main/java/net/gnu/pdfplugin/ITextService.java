@@ -11,7 +11,7 @@ public class ITextService extends Service {
 	static final String LOG_TAG = "ITextService";
 
 	public void onStart(final Intent intent, final int startId) {
-		super.onStart(intent, startId);
+		super.onStart( intent, startId );
 	}
 
 	public void onDestroy() {
@@ -74,8 +74,6 @@ public class ITextService extends Service {
 				ITextUtil.pdfToText(fPath, fOutPath);
 			} catch (IOException e) {
 				throw new RemoteException(e.getMessage());
-//			} finally {
-//				ITextService.this.stopSelf();
 			}
 		}
 

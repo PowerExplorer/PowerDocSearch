@@ -52,8 +52,8 @@ import net.gnu.agrep.R;
  * providing the layout ID of your custom layout.
  */
 public class SlidingHorizontalScroll extends HorizontalScrollView {
-	//private long t = 0;
-	private static int no = 1;
+	private static final String TAG = "SlidingHorizontalScroll";
+	
     /**
      * Allows complete control over the colors drawn in the tab layout. Set with
      * {@link #setCustomTabColorizer(TabColorizer)}.
@@ -176,7 +176,7 @@ public class SlidingHorizontalScroll extends HorizontalScrollView {
      * {@link #setCustomTabView(int, int)}.
      */
     protected TextView createDefaultTabView(Context context) {
-        TextView textView = new TextView(context);
+		final TextView textView = new TextView(context);
         textView.setGravity(Gravity.CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, TAB_VIEW_TEXT_SIZE_SP);
         textView.setTypeface(Typeface.DEFAULT_BOLD);
@@ -210,7 +210,7 @@ public class SlidingHorizontalScroll extends HorizontalScrollView {
         for (int i = 0; i < count; i++) {
             View tabView = null;
             TextView tabTitleView = null;
-
+			
             if (mTabViewLayoutId != 0) {
                 // If there is a custom tab view layout id set, try and inflate it
                 tabView = LayoutInflater.from(getContext()).inflate(mTabViewLayoutId, mTabStrip,
@@ -230,7 +230,7 @@ public class SlidingHorizontalScroll extends HorizontalScrollView {
 			if (tabTitleView == null && TextView.class.isInstance(tabView)) {
                 tabTitleView = (TextView) tabView;
             }
-
+			
             tabTitleView.setText(adapter.getPageTitle(i));
 			tabTitleView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
 			tabTitleView.setMaxEms(9);
@@ -320,7 +320,6 @@ public class SlidingHorizontalScroll extends HorizontalScrollView {
 	public void setTabAction(SlidingTabsFragment fra) {
 		this.fra = fra;
 	}
-	private static final String TAG = "SlidingHorizontalScroll";
 	
 	private SlidingTabsFragment fra;
 	
@@ -340,7 +339,7 @@ public class SlidingHorizontalScroll extends HorizontalScrollView {
 						popup.getMenuInflater().inflate(R.menu.popup, popup.getMenu());
 						final int count = fra.getSize();
 						if (count == 1) {
-							popup.getMenu().getItem(2).setVisible(false);
+							popup.getMenu().findItem(R.id.closeOthers).setVisible(false);
 						}
 						popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 								public boolean onMenuItemClick(MenuItem item) {

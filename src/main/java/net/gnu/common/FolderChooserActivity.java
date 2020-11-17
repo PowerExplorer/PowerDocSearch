@@ -244,7 +244,6 @@ public class FolderChooserActivity extends StorageCheckActivity implements View.
 				}
 			} else if (Intent.ACTION_GET_CONTENT.equals(action)) {
 				if (!intent.getBooleanExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)) {
-					multiFiles = false;
 					if (suffix.length() == 0) {
 						suffix = ".*";
 					}
@@ -302,10 +301,13 @@ public class FolderChooserActivity extends StorageCheckActivity implements View.
 		if (arr != null && itemCount > 0) {
 			dataSourceL2.clear();
 			for (String st : arr) {
-				dataSourceL2.add(new FileInfo(st));
+				if (st != null && st.trim().length() > 0) {
+					dataSourceL2.add(new FileInfo(st));
+				}
 			}
 			selectionStatus2.setText("0/" + dataSourceL2.size());
-			multiFiles = true;
+			if (itemCount > 1)
+				multiFiles = true;
 		}
 		if (multiFiles && !Intent.ACTION_MAIN.equals(action)) {
 			destAdapter = new ArrayAdapter(this, R.layout.list_item, dataSourceL2);

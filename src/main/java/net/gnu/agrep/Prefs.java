@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import java.util.Collection;
 
 
 public class Prefs {
@@ -39,7 +40,7 @@ public class Prefs {
     int mHighlightFg = 0xFF000000;
     boolean addLineNumber=false;
 	int tabCount = 0;
-    ArrayList<CheckedString> mDirList = new ArrayList<CheckedString>();
+    Collection<CheckedString> mDirList = new ArrayList<CheckedString>();
     ArrayList<CheckedString> mExtList = new ArrayList<CheckedString>();
 
 	static public Prefs loadPrefes(final Context ctx) {

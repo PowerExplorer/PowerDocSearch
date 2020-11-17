@@ -15,8 +15,18 @@ import android.preference.PreferenceScreen;
 import android.view.MenuItem;
 import net.gnu.agrep.R;
 import android.util.Log;
+import net.gnu.androidutil.*;
+import android.webkit.*;
+import java.io.*;
+import net.gnu.common.*;
+import android.view.*;
+import android.content.*;
+import android.app.*;
+import net.gnu.util.*;
 
 public class OptionActivity extends PreferenceActivity {
+	private String TAG = "OptionActivity";
+	
     final public static int DefaultHighlightColor=0xFF00FFFF;
 
     private PreferenceScreen mPs = null;
@@ -39,26 +49,8 @@ public class OptionActivity extends PreferenceActivity {
         mPm = getPreferenceManager();
         mPs = mPm.createPreferenceScreen(this);
 
-        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this); {
-            final Preference pr = new Preference(this);
-            // set Version Name to title field
-            try {
-                pr.setTitle(getString(R.string.version, getPackageManager()
-									  .getPackageInfo(getPackageName(), 0).versionName));
-            } catch (NameNotFoundException e) {
-            }
-            pr.setSummary(R.string.link);
-            pr.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-					@Override
-					public boolean onPreferenceClick(Preference preference) {
-						Intent intent = new Intent(Intent.ACTION_VIEW);
-						intent.setData(Uri.parse("market://details?id=net.gnu.agrep"));
-						startActivity(intent);
-						return true;
-					}
-				});
-            mPs.addPreference(pr);
-        } {
+        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this); 
+		{
             // フォントサイズ
             final ListPreference pr = new ListPreference(this);
             pr.setKey(Prefs.KEY_FONTSIZE);
@@ -78,21 +70,105 @@ public class OptionActivity extends PreferenceActivity {
             pr.setTitle(R.string.label_add_linenumber);
             mPs.addPreference(pr);
         }
-//		{
-//            final Preference pr = new Preference(this);
-//            pr.setTitle(R.string.icondesign);
-//            pr.setSummary(R.string.iconsite);
-//            pr.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-//					@Override
-//					public boolean onPreferenceClick(Preference preference) {
+		{
+            // Clear Cache
+            final Preference pr = new Preference(this);
+            pr.setTitle("Clear Cache");
+			pr.setSummary("");
+            pr.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						AlertDialog.Builder alert = new AlertDialog.Builder(OptionActivity.this);
+						alert.setTitle("Clear Caching Files");
+						alert.setIconAttribute(android.R.attr.alertDialogIcon);
+						long[] entry = new long[] {0, 0, 0};
+						FileUtil.getDirSize(SearcherAplication.PRIVATE_DIR, entry);
+						alert.setMessage("Cache has " + Util.nf.format(entry[2]) + " folders, " + Util.nf.format(entry[0])
+										 + " files, " + Util.nf.format(entry[1])
+										 + " bytes. " + "\r\nAre you sure you want to clear the cached files? "
+										 + "\r\nAfter cleaning searching will be slow for the first times " +
+										 "and the searching task maybe incorrect.");
+						alert.setCancelable(true);
+
+						alert.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									int num = FileUtil.deleteFiles(SearcherAplication.PRIVATE_DIR, true);
+									Log.d(TAG, "Clean cache" + num + " files deleted");
+
+								}
+							});
+
+						alert.setPositiveButton("No", new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.cancel();
+								}
+							});
+
+						AlertDialog alertDialog = alert.create();
+						alertDialog.show();
+						return true;
+					}
+				});
+            mPs.addPreference(pr);
+        } {
+			final Preference pr = new Preference(this);
+			pr.setTitle("Licence");
+            pr.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
 //						Intent intent = new Intent(Intent.ACTION_VIEW);
-//						intent.setData(Uri.parse(getString(R.string.iconlink)));
+//						intent.setData(Uri.parse("market://details?id=net.gnu.agrep"));
 //						startActivity(intent);
-//						return true;
-//					}
-//				});
-//            mPs.addPreference(pr);
-//        }
+						AndroidUtils.copyAssetToDir(OptionActivity.this, SearcherAplication.PRIVATE_PATH, "lic.html"); 
+
+						final WebView wv = new WebView(OptionActivity.this);
+						wv.loadUrl(new File(SearcherAplication.PRIVATE_PATH + "/lic.html").toURI().toString());
+						wv.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+						AlertDialog dialog = new AlertDialog.Builder(OptionActivity.this)
+							.setIcon(R.drawable.icon)
+							.setIconAttribute(android.R.attr.dialogIcon)
+							.setTitle("Power DocSearch")
+							.setView(wv)
+							.setPositiveButton(R.string.ok,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									dialog.dismiss();
+								}
+							}).create();
+						dialog.show();
+						return true;
+					}
+				});
+            mPs.addPreference(pr);
+        } {
+            final Preference pr = new Preference(this);
+            pr.setTitle("Update");
+            pr.setSummary("Get lastest version");
+            pr.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						Intent intent = new Intent(Intent.ACTION_VIEW);
+						intent.setData(Uri.parse("https://github.com/PowerExplorer/PowerDocSearch/releases/"));
+						startActivity(intent);
+						return true;
+					}
+				});
+            mPs.addPreference(pr);
+        } {
+            final Preference pr = new Preference(this);
+            // set Version Name to title field
+            try {
+                pr.setTitle(getString(R.string.version, getPackageManager()
+									  .getPackageInfo(getPackageName(), 0).versionName));
+            } catch (NameNotFoundException e) {
+				e.printStackTrace();
+            }
+            pr.setSummary(R.string.link);
+			mPs.addPreference(pr);
+		} 
         setPreferenceScreen(mPs);
 
     }

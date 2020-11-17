@@ -13,7 +13,7 @@ public class CheckedString implements Comparable<CheckedString> {
         string = _s;
     }
     public String toString() {
-        return (checked ?"true": "false") + "|" + string;
+        return (checked ? string : ""); //"true": "false") + "|" + string;
     }
 
 	@Override

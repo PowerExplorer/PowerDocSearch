@@ -2,36 +2,35 @@
 <menu
 	xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<item android:title="@string/label_option"
-		android:id="@+id/menu_option"
-		android:icon = "@drawable/ic_menu_preferences"
-		android:alphabeticShortcut = "O"></item>
-
 	<item android:title="Duplicate Finder" 
 		android:id="@+id/menu_duplicate_finder"
 		android:alphabeticShortcut = "D"></item>
+		
+	<item
+				android:id="@+id/action_pdf2Image"
+				android:onClick="pdf2Image"
+				android:showAsAction="never"
+				android:title="PDFs to Images"/>
+				
+	<item
+                android:id="@+id/action_tts"
+                android:onClick="tts"
+                android:showAsAction="never"
+                android:title="Text to Speech"/>
 
-	<item android:title="Clear Cache"
-		android:id="@+id/menu_clear_cache"
-		android:alphabeticShortcut = "C"></item>
 
 	<item
         android:id="@+id/device_info "
-        android:menuCategory="secondary"
-        android:title="Device Info >">
+        android:title="Device Info">
         <menu>
 			<item
 				android:id="@+id/systemFeatures"
 				android:onClick="systemFeatures"
-				android:orderInCategory="240"
-				android:showAsAction="never"
 				android:title="System Features"/>
 
 			<item
 				android:id="@+id/sensors"
 				android:onClick="sensors"
-				android:orderInCategory="245"
-				android:showAsAction="never"
 				android:title="Sensors"/>
 		</menu>
 	</item>
@@ -41,16 +40,21 @@
 		android:alphabeticShortcut = "S"></item>
 
 	
-	<item
-        android:id="@+id/action_about"
-        android:menuCategory="secondary"
-        android:onClick="about"
-        android:orderInCategory="240"
-        android:showAsAction="never"
-        android:title="About"/>
+	<item android:title="@string/label_option"
+		android:id="@+id/menu_option"
+		android:icon = "@drawable/ic_menu_preferences"
+		android:alphabeticShortcut = "O"></item>
 
+	
+	
 	<!---
 	<item android:title="@string/help" android:id="@+id/help"
+	android:orderInCategory="240"
+				android:showAsAction="never"
+				android:menuCategory="secondary"
+        
+	android:orderInCategory="245"
+				android:showAsAction="never"
     android:icon = "@android:drawable/ic_menu_help"
     android:alphabeticShortcut = "H"></item>
 	-->

@@ -7,16 +7,22 @@ import android.util.Log;
 import android.os.AsyncTask;
 import java.util.TreeSet;
 import java.io.File;
+import java.util.*;
+import android.widget.*;
 
 public class RetainFrag extends Fragment {
 	private static final String TAG = "RetainFrag";
 
-	GrepTask mTask;
+	public ConvertTask mTask;
+	public AsyncTask callBackTask;
+	
 	ArrayList<GrepView.Data> mData = new ArrayList<GrepView.Data>();
 	GrepView.GrepAdapter mAdapter;
 	boolean hidden = false;
 	SettingsFragment searchFragment;
-	TreeSet<File> fileList;
+	public TextView statusTV;
+	public Collection<? extends Object> oriList;
+	public TreeSet<File> fileList;
 	Cache cache;
 	boolean newSearch = true;
 	
@@ -43,10 +49,10 @@ public class RetainFrag extends Fragment {
 
 	@Override
 	public void onResume() {
-		Log.d(TAG, "onResume hidden " + hidden + ", mTask " + (mTask != null ? mTask.getStatus() : "null") + ", adapter " + searchFragment.mGrepView.getAdapter() + ", mData " + mData);
 		super.onResume();
 		if (mTask != null) {
-			if (!searchFragment.fake && hidden) {
+			if (searchFragment != null && !searchFragment.fake && hidden) {
+				Log.d(TAG, "onResume hidden " + hidden + ", mTask " + (mTask != null ? mTask.getStatus() : "null") + ", adapter " + searchFragment.mGrepView.getAdapter() + ", mData " + mData);
 				AsyncTask.Status status = mTask.getStatus();
 				if (status == AsyncTask.Status.RUNNING) {
 					mTask.runProgress();

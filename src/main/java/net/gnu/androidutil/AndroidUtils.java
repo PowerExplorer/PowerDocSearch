@@ -117,9 +117,19 @@ public class AndroidUtils {
 //		}
 	}
 	
-	public static void pdfToImage(File f, String outDir) throws IOException {
-        // In this sample, we read a PDF from the assets directory.
-        ParcelFileDescriptor mFileDescriptor = null;
+	public static void pdfToImage(final File f, final String outDir,
+								  final int zoom,
+								  boolean extractImages,
+								  int left, int top, int right, int bottom,
+								  int background,
+								  Bitmap.CompressFormat type,
+								  int rate) throws IOException {
+        Log.d(TAG, "pdfToImage density " + zoom + ", " + f.getAbsolutePath() + ", " + outDir);
+		// In this sample, we read a PDF from the assets directory.
+
+		final String name = (outDir.endsWith("/") ? outDir : outDir+"/") + f.getName();
+		final float zoom100 = (float)zoom / 100;
+		ParcelFileDescriptor mFileDescriptor = null;
 		PdfRenderer mPdfRenderer = null;
 		PdfRenderer.Page mCurrentPage = null;
 		try {
@@ -127,23 +137,48 @@ public class AndroidUtils {
 			// This is the PdfRenderer we use to render the PDF.
 			mPdfRenderer = new PdfRenderer(mFileDescriptor);
 
-			int count = mPdfRenderer.getPageCount();
+			final int count = mPdfRenderer.getPageCount();
 			// Use `openPage` to open a specific page in PDF.
-			String name = outDir + "/" + f.getName();
 			for (int i = 0; i < count; i++) {
 				mCurrentPage = mPdfRenderer.openPage(i);
 				// Important: the destination bitmap must be ARGB (not RGB).
-				Bitmap bitmap = Bitmap.createBitmap(mCurrentPage.getWidth(), mCurrentPage.getHeight(),
+				int width = (int) (mCurrentPage.getWidth() * zoom100);
+				int height = (int) (mCurrentPage.getHeight() * zoom100);
+				Bitmap bitmap = Bitmap.createBitmap(width, 
+													height,
 													Bitmap.Config.ARGB_8888);
 
 				// Here, we render the page onto the Bitmap.
 				// To render a portion of the page, use the second and third parameter. Pass nulls to get
 				// the default result.
 				// Pass either RENDER_MODE_FOR_DISPLAY or RENDER_MODE_FOR_PRINT for the last parameter.
-				mCurrentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT);
+				mCurrentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
 				// Make sure to close the current page before opening another one.
 				mCurrentPage.close();
-				BitmapUtil.saveBitmap(bitmap, name + "_" + Util.nf.format(i)+".png");
+				Bitmap cropedBitmap = Bitmap.createBitmap(
+					bitmap,
+					left,
+					top,
+					width - left - right,
+					height - top - bottom
+				);
+
+				Bitmap newBitmap = Bitmap.createBitmap(cropedBitmap.getWidth(), cropedBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+				Canvas canvas = new Canvas(newBitmap);
+
+				canvas.drawColor(background);
+
+				canvas.drawBitmap(cropedBitmap, 0 , 0 , null);
+
+				final String ext = type == Bitmap.CompressFormat.PNG ? ".png" : type == Bitmap.CompressFormat.JPEG ? ".jpg" : ".webp";
+				bitmap.recycle();
+				cropedBitmap.recycle();
+				bitmap = null;
+				cropedBitmap = null;
+				BitmapUtil.saveBitmap(newBitmap, type, rate, 
+									  String.format(name + "_%1$03d", i + 1) + ext);
+				newBitmap.recycle();
 			}
 		} finally {
 			mPdfRenderer.close();

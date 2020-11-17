@@ -257,7 +257,7 @@ public class Util {
 			ComparableEntry<String, String> e;
 			while (stk.size() > 0) {
 				e = stk.pop();
-				fileContent = HtmlUtil.replaceAll(fileContent, e.key, e.value, isRegex, caseSensitive);
+				fileContent = replaceAll(fileContent, e.key, e.value, isRegex, caseSensitive);
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -267,9 +267,9 @@ public class Util {
 
 	public static final String replaceAll(String fileContent, String from, String to, final boolean isRegex, final boolean caseSensitive) {
 		//Log.d("content", ""+ fileContent);
-		Log.d("regex", "" + isRegex);
-		Log.d("caseSensitive", ""+ caseSensitive);
-		Log.d("from,to", from + "," + to);
+		Log.d(TAG, "regex " + isRegex);
+		Log.d(TAG, "caseSensitive "+ caseSensitive);
+		Log.d(TAG, "from,to " + from + "," + to);
 		if (isRegex) {
 			from = from.replaceAll("\\\\n", "\n");
 			from = from.replaceAll("\\\\t", "\t");
@@ -286,7 +286,7 @@ public class Util {
 			from = from.replaceAll(SPECIAL_CHAR_PATTERNSTR, "\\\\$1");
 			to = to.replaceAll(SPECIAL_CHAR_PATTERNSTR, "\\\\$1");
 		}
-		Log.d("from,to", from + "," + to);
+		Log.d(TAG, "from,to " + from + "," + to);
 
 		final Pattern p = Pattern.compile(from, caseSensitive ? Pattern.UNICODE_CASE : Pattern.CASE_INSENSITIVE);
 		fileContent = p.matcher(fileContent).replaceAll(to);
@@ -311,7 +311,7 @@ public class Util {
 	}
 
 	public static String arrayToString(Object[] list, boolean number, String sep) {
-		if (list == null) {
+		if (list == null || list.length == 0) {
 			return "";
 		}
 		StringBuilder sb = new StringBuilder();
@@ -327,7 +327,7 @@ public class Util {
 		} else {
 			int counter = 0;
 			for (Object obj : list) {
-				sb.append(++counter + ": ").append(obj);
+				sb.append(++counter).append(": ").append(obj);
 				if (c++ < len) {
 					sb.append(sep);
 				}

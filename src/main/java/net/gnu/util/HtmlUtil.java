@@ -894,35 +894,7 @@ public class HtmlUtil {
 		return wholeFile;
 	}
 	
-	public static final String SPECIAL_CHAR_PATTERNSTR = "([{}^$.\\[\\]|*+?()\\\\])";
-	public static final String replaceAll(String fileContent, String from, String to, final boolean isRegex, final boolean caseSensitive) {
-		//Log.d("content", ""+ fileContent);
-		Log.d("regex", "" + isRegex);
-		Log.d("caseSensitive", ""+ caseSensitive);
-		Log.d("from,to", from + "," + to);
-		if (isRegex) {
-			from = from.replaceAll("\\\\n", "\n");
-			from = from.replaceAll("\\\\t", "\t");
-			from = from.replaceAll("\\\\r", "\r");
-			from = from.replaceAll("\\\\f", "\f");
-			from = from.replaceAll("\\\\b", "\b");
-
-			to = to.replaceAll("\\\\n", "\n");
-			to = to.replaceAll("\\\\t", "\t");
-			to = to.replaceAll("\\\\r", "\r");
-			to = to.replaceAll("\\\\f", "\f");
-			to = to.replaceAll("\\\\b", "\b");
-		} else {
-			from = from.replaceAll(SPECIAL_CHAR_PATTERNSTR, "\\\\$1");
-			to = to.replaceAll(SPECIAL_CHAR_PATTERNSTR, "\\\\$1");
-		}
-		Log.d("from,to", from + "," + to);
-		
-		final Pattern p = Pattern.compile(from, caseSensitive ? Pattern.UNICODE_CASE : Pattern.CASE_INSENSITIVE);
-		fileContent = p.matcher(fileContent).replaceAll(to);
-		
-		return fileContent;
-	}
+	
 
 	public static String removeTags(String wholeFile) {
 

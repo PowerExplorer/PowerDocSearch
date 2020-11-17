@@ -144,6 +144,7 @@
             android:label="Duplicate Finder" 
 			android:icon="@drawable/icon"
             android:launchMode="singleTask"
+            android:parentActivityName=".AGrepActivity"
         >
 			<intent-filter>
 				<action android:name="android.intent.action.SEND" />
@@ -168,6 +169,58 @@
                 <data android:scheme="file"/>
 			</intent-filter>
 		</activity>
+		
+		<activity android:name="net.gnu.common.Pdf2ImageActivity"
+			android:label="PDF to Images" 
+			android:icon="@drawable/icon"
+            android:launchMode="singleTask"
+            android:parentActivityName=".AGrepActivity"
+			android:configChanges="orientation|keyboardHidden|screenSize">
+				<intent-filter>
+				<action android:name="android.intent.action.SEND" />
+				<action android:name="android.intent.action.SENDTO" />
+				<action android:name="android.intent.action.SEND_MULTIPLE" />
+                <action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.OPENABLE"/>
+                <data android:mimeType="application/pdf" />
+
+			</intent-filter>
+		</activity>
+			
+			<activity android:name="net.gnu.common.TTSActivity"
+			android:label="Text to Speech" 
+			android:icon="@drawable/icon"
+            android:launchMode="singleTask"
+            android:parentActivityName=".AGrepActivity"
+			android:configChanges="orientation|keyboardHidden|screenSize">
+			<intent-filter>
+				<action android:name="android.intent.action.SEND" />
+				<action android:name="android.intent.action.SENDTO" />
+				<action android:name="android.intent.action.SEND_MULTIPLE" />
+                <action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.OPENABLE"/>
+                <data android:mimeType="text/*" />
+
+			</intent-filter>
+			
+			<intent-filter>
+				<action android:name="android.intent.action.SEND" />
+				<action android:name="android.intent.action.SENDTO" />
+				<action android:name="android.intent.action.SEND_MULTIPLE" />
+                <action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.OPENABLE"/>
+                <data android:scheme="file"/>
+			</intent-filter>
+		</activity>
+			
+
+
 
 		<!--<activity android:name=".Search"
 			android:configChanges="keyboardHidden|orientation"

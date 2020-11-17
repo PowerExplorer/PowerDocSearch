@@ -238,7 +238,7 @@
     <string name="rootPrefSummary">Show Permissions of Files and Folders</string>
     <string name="rootPref">Show Permissions</string>
     <string name="aboutFileManager">About Amaze File Manager</string>
-    <string name="version">Version</string>
+    
     <string name="rate">Rate the app</string>
     <string name="license">Open Source Licenses</string>
     <string name="feedback">Send Feedback</string>

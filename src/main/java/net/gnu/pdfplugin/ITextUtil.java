@@ -17,89 +17,55 @@ import java.util.*;
 import com.itextpdf.text.exceptions.*;
 import com.itextpdf.text.pdf.parser.*;
 import android.util.*;
+import net.gnu.util.FileUtil;
 
 public class ITextUtil {
+	
+	private static final String TAG = "ITextUtil";
 
-	public static void close(final Closeable closable) {
-		if (closable != null) {
-			try {
-				closable.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public static void flushClose(final OutputStream closable) {
-		if (closable != null) {
-			try {
-				closable.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try {
-				closable.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public static void flushClose(final Writer closable) {
-		if (closable != null) {
-			try {
-				closable.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try {
-				closable.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public static void extractPdfImages(final String src, final String dest)
+	public static void extractPdfImages(final String src, final String outDir)
 	throws IOException {
+		Log.d(TAG, "extractPdfImages src " + src + ", outDir " + outDir);
 		final PdfReader reader = new PdfReader(src);
 		final int xrefSize = reader.getXrefSize();
+		final String imageName = PdfName.IMAGE.toString();
+		int j = 1;
+		final String name = (outDir.endsWith("/") ? outDir : outDir+"/") + new File(src).getName();
 		for (int i = 0; i < xrefSize; i++) {
 			final PdfObject pdfobj = reader.getPdfObject(i);
-			if (pdfobj == null || !pdfobj.isStream()) {
-				continue;
+			if (pdfobj != null && pdfobj.isStream()) {
+				final PdfStream stream = (PdfStream) pdfobj;
+				//final PdfObject pdfsubtype = stream.get(PdfName.SUBTYPE);
+				final PdfObject pdfsubtype = stream.getDirectObject(PdfName.SUBTYPE);
+				if (pdfsubtype != null && pdfsubtype.toString().startsWith(imageName)) {
+					final byte[] img = PdfReader.getStreamBytesRaw((PRStream) stream);
+					final String fileName = String.format(name + "-%1$04d", j++) + ".png";
+					final FileOutputStream fos = new FileOutputStream(fileName);
+					final BufferedOutputStream bos = new BufferedOutputStream(fos);
+					bos.write(img);
+					FileUtil.flushClose(bos, fos);
+					Log.d(TAG, "wrote " + fileName);
+				}
 			}
-			final PdfStream stream = (PdfStream) pdfobj;
-			// PdfObject pdfsubtype = stream.get(PdfName.SUBTYPE);
-			final PdfObject pdfsubtype = stream.getDirectObject(PdfName.SUBTYPE);
-			if (pdfsubtype != null && pdfsubtype.toString().equals(PdfName.IMAGE.toString())) {
-				final byte[] img = PdfReader.getStreamBytesRaw((PRStream) stream);
-				final File file = new File(String.format(dest + "-%1$05d", i) + ".jpg");
-				final FileOutputStream fos = new FileOutputStream(file);
-				final BufferedOutputStream bos = new BufferedOutputStream(fos);
-				bos.write(img);
-				flushClose(bos);
-				flushClose(fos);
-				Log.d("wrote", file.getAbsolutePath());
-			}
+			
 		}
 //		PdfReader reader = new PdfReader(src);
+//		final int xrefSize = reader.getXrefSize();
 //		PdfObject obj;
-//		for (int i = 1; i <= reader.getXrefSize(); i++) {
+//		for (int i = 0; i <= xrefSize; i++) {
 //			obj = reader.getPdfObject(i);
 //			if (obj != null && obj.isStream()) {
-//				PRStream stream = (PRStream) obj;
-//				byte[] b;
+//				final PRStream stream = (PRStream) obj;
+//				final byte[] b;
 //				try {
 //					b = PdfReader.getStreamBytes(stream);
 //				} catch (UnsupportedPdfException e) {
 //					b = PdfReader.getStreamBytesRaw(stream);
 //				}
-//				FileOutputStream fos = new FileOutputStream(String.format(dest,
-//						i));
-//				fos.write(b);
-//				fos.flush();
-//				fos.close();
+//				final FileOutputStream fos = new FileOutputStream(String.format(dest + "-%1$05d", i) + ".png");
+//				final BufferedOutputStream bos = new BufferedOutputStream(fos);
+//				bos.write(b);
+//				flushClose(bos, fos);
 //			}
 //		}
 	}
@@ -139,8 +105,8 @@ public class ITextUtil {
 
 	public static void parsePdfToText(final String pdfFile,
 			final String txtFile) throws IOException {
-		Log.i("Source PDF:", pdfFile);
-		Log.i("Destination txtFile: ", txtFile);
+		Log.i(TAG, "parsePdfToText Source PDF:" + pdfFile);
+		Log.i(TAG, "parsePdfToText Destination txtFile: " + txtFile);
 		final PdfReader reader = new PdfReader(pdfFile);
 		final String tmpTxt = txtFile + ".tmp";
 		final PrintWriter out = new PrintWriter(new FileOutputStream(tmpTxt));
@@ -151,7 +117,7 @@ public class ITextUtil {
 //			out.println(PdfTextExtractor.getTextFromPage(
 //			 		reader, i, new SimpleTextExtractionStrategy()));
 		}
-		flushClose(out);
+		FileUtil.flushClose(out);
 		final File file = new File(txtFile);
 		file.delete();
 		new File(tmpTxt).renameTo(file);
@@ -173,7 +139,7 @@ public class ITextUtil {
 			// } catch (Throwable t) {
 
 			parsePdfToText(pdfPath, txtPath);
-			Log.d("ITextUtil", "pdfToText successfully");
+			Log.d(TAG, "pdfToText Used ItextPdfToHtml successfully");
 			// String command = "./lib/pdftohtml.exe \"" + pdfPath
 			// + "\" \"" + txtPath + "\"";
 			// Util.LOGGER.info(command);
@@ -198,7 +164,7 @@ public class ITextUtil {
 			// // p.getOutputStream(), null, null);
 			// }
 		} else {
-			Log.d(pdfPath + " has already converted before to file : ", txtPath);
+			Log.d(TAG, pdfPath + " has already converted before to file : " + txtPath);
 		}
 	}
 } 

@@ -53,6 +53,7 @@ import java.util.regex.Matcher;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.Spannable;
+import java.util.Collection;
 
 public class SettingsFragment extends Fragment implements GrepView.Callback {
 
@@ -636,8 +637,12 @@ public class SettingsFragment extends Fragment implements GrepView.Callback {
 		}
 		retainFrag.mData.clear();
 		retainFrag.mAdapter.setFormat(mPattern, mPrefs.mHighlightFg, mPrefs.mHighlightBg, mPrefs.mFontSize);
-		retainFrag.mTask = new GrepTask(retainFrag);//SettingsFragment.this);
-		retainFrag.mTask.execute(mQuery);
+		final SearchTask searchTask = new SearchTask(retainFrag, mQuery);
+		retainFrag.callBackTask = searchTask;
+		retainFrag.oriList = mPrefs.mDirList;
+		retainFrag.statusTV = statusTV;
+		retainFrag.mTask = new ConvertTask(retainFrag, searchTask);//SettingsFragment.this);
+		retainFrag.mTask.execute();
 	}
 	
 	void showGrep(boolean showGrep) {
@@ -746,7 +751,7 @@ public class SettingsFragment extends Fragment implements GrepView.Callback {
     }
 
     private void refreshDirList() {
-		mDirListView.setAdapter(new DirAdapter(mContext, android.R.layout.simple_list_item_checked, android.R.id.text1, mPrefs.mDirList));
+		mDirListView.setAdapter(new DirAdapter(mContext, android.R.layout.simple_list_item_checked, android.R.id.text1, (ArrayList<CheckedString>)mPrefs.mDirList));
         //setListItem(mDirListView, mPrefs.mDirList, mDirListener, mCheckListener);
     }
     private void refreshExtList() {

@@ -15,6 +15,8 @@ import android.app.*;
 import net.gnu.util.*;
 
 public class BitmapUtil {
+
+	private static String TAG = "BitmapUtil";
 	
 	public static void setImageDrawable(ImageView imgView, Context ctx, int resId) {
 		imgView.setImageBitmap(BitmapFactory.decodeResource(ctx.getResources(), resId));
@@ -156,21 +158,64 @@ public class BitmapUtil {
 		return bmp;
 	}
 	
-	public static File saveBitmap(final Bitmap bitmap,
+	
+	
+	public static File saveBitmap2WEBP(final Bitmap bitmap,
+									   final String filename) {
+		OutputStream outStream = null;
+		BufferedOutputStream bos = null;
+		final File out = new File(filename);
+		out.getParentFile().mkdirs();
+		Log.i(TAG, "saveBitmap2WEBP " + filename);
+		final File file = new File(filename);
+		try {
+			outStream = new FileOutputStream(file);
+			bos = new BufferedOutputStream(outStream);
+			bitmap.compress(Bitmap.CompressFormat.WEBP, 100, bos);
+		} catch (final Throwable e) {
+			Log.e(TAG, e.getMessage(), e);
+		} finally {
+			FileUtil.flushClose(bos, outStream);
+		}
+		return file;
+	}
+
+	public static File saveBitmap2JPG(final Bitmap bitmap,
+									  final String filename) {
+		OutputStream outStream = null;
+		BufferedOutputStream bos = null;
+		final File out = new File(filename);
+		out.getParentFile().mkdirs();
+		Log.i(TAG, "saveBitmap2JPG " + filename);
+		final File file = new File(filename);
+		try {
+			outStream = new FileOutputStream(file);
+			bos = new BufferedOutputStream(outStream);
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+		} catch (final Throwable e) {
+			Log.e(TAG, e.getMessage(), e);
+		} finally {
+			FileUtil.flushClose(bos, outStream);
+		}
+		return file;
+	}
+	
+	public static File saveBitmap(final Bitmap bitmap, 
+								  Bitmap.CompressFormat type, 
+								  int rate,
 								  final String filename) {
 		OutputStream outStream = null;
 		BufferedOutputStream bos = null;
 		final File out = new File(filename);
 		out.getParentFile().mkdirs();
-		Log.i("GEITH", "Writing Bitmap to " + filename);
+		Log.i(TAG, "saveBitmap " + filename);
 		final File file = new File(filename);
 		try {
 			outStream = new FileOutputStream(file);
 			bos = new BufferedOutputStream(outStream);
-			bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
-			
-		} catch (final Exception e) {
-			e.printStackTrace();
+			bitmap.compress(type, rate, bos);
+		} catch (final Throwable e) {
+			Log.e(TAG, e.getMessage(), e);
 		} finally {
 			FileUtil.flushClose(bos, outStream);
 		}

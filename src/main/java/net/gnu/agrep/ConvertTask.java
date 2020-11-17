@@ -35,24 +35,26 @@ import net.gnu.pdfplugin.ITextUtil;
 import android.content.Context;
 import java.io.StringReader;
 
-public class GrepTask extends AsyncTask<String, Object, Boolean> {
-	private static final String TAG = "GrepTask";
+public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
+	private static final String TAG = "ConvertTask";
 
 	//private ProgressDialog mProgressDialog;
 	private int mFileCount=0;
 	private int mFoundcount=0;
 	private boolean mCancelled;
 	private RetainFrag retainFrag;
+	private AsyncTask callBack;
 	
 	private long start = System.nanoTime();
 
-	public GrepTask(RetainFrag retainFrag) {
+	public ConvertTask(RetainFrag retainFrag, AsyncTask callBack) {
 		this.retainFrag = retainFrag;
+		this.callBack = callBack;
 	}
 
 	@Override
 	public String toString() {
-		return "GrepTask " + super.toString() + ", retainFrag " + retainFrag;
+		return "ConvertTask " + super.toString() + ", retainFrag " + retainFrag;
 	}
 
 	@Override
@@ -80,29 +82,31 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 	}
 
 	@Override
-	protected Boolean doInBackground(String... params) {
-		return grepRoot(params[0]);
+	protected Boolean doInBackground(Void... params) {
+		return grepRoot();
 	}
 
 	@Override
 	protected void onPostExecute(Boolean result) {
-		Log.d(TAG, "onPostExecute.retainFrag.mData" + retainFrag.mData + ", hidden " + retainFrag.hidden);
-//			if (mProgressDialog != null) {
-//				mProgressDialog.dismiss();
-//				mProgressDialog = null;
+		publishProgress("Finish converting, took " + Util.nf.format(System.nanoTime()-start) + " ns");
+		callBack.execute();
+//		Log.d(TAG, "onPostExecute.retainFrag.mData" + retainFrag.mData + ", hidden " + retainFrag.hidden);
+////			if (mProgressDialog != null) {
+////				mProgressDialog.dismiss();
+////				mProgressDialog = null;
+////			}
+//
+//		Collections.sort(retainFrag.mData);
+//		if (!retainFrag.hidden) {
+//			synchronized (retainFrag.mData) {
+//				retainFrag.mAdapter.notifyDataSetChanged();
 //			}
-
-		Collections.sort(retainFrag.mData);
-		if (!retainFrag.hidden) {
-			synchronized (retainFrag.mData) {
-				retainFrag.mAdapter.notifyDataSetChanged();
-			}
-			retainFrag.searchFragment.mGrepView.setSelection(0);
-		}
-		Toast.makeText(retainFrag.getContext(), result ?R.string.grep_finished: R.string.grep_canceled, Toast.LENGTH_LONG).show();
-//          if (retainFrag.opUtil != null) {
-//				retainFrag.opUtil.releaseOpService();
-//			}
+//			retainFrag.searchFragment.mGrepView.setSelection(0);
+//		}
+//		Toast.makeText(retainFrag.getContext(), result ?R.string.grep_finished: R.string.grep_canceled, Toast.LENGTH_LONG).show();
+////          if (retainFrag.opUtil != null) {
+////				retainFrag.opUtil.releaseOpService();
+////			}
 	}
 
 	@Override
@@ -116,29 +120,28 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 		if (isCancelled()) {
 			return;
 		}
-		if (retainFrag.cache != null) {
-			retainFrag.searchFragment.statusTV.setText("Found " + mFoundcount + " " + retainFrag.getString(R.string.progress, retainFrag.searchFragment.mQuery, mFileCount) + ", cached " + retainFrag.cache.cacheStatus + ", took " + Util.nf.format(System.nanoTime() - start) + " ns");
-		}
-//			if (mProgressDialog != null) {
-//				mProgressDialog.setMessage(searchActivity.getString(R.string.progress, mQuery, mFileCount));
-//			}
+//		if (retainFrag.cache != null) {
+//			retainFrag.searchFragment.statusTV.setText("Found " + mFoundcount + " " + retainFrag.getString(R.string.progress, retainFrag.searchFragment.mQuery, mFileCount) + ", cached " + retainFrag.cache.cacheStatus + ", took " + Util.nf.format(System.nanoTime() - start) + " ns");
+//		}
+////			if (mProgressDialog != null) {
+////				mProgressDialog.setMessage(searchActivity.getString(R.string.progress, mQuery, mFileCount));
+////			}
 		if (progress != null) {
 			if (progress[0] instanceof String) {
-				retainFrag.searchFragment.statusTV.setText((CharSequence)progress[0]);
-			} else {
-				synchronized (retainFrag.mData) {
-					for (Object data : progress) {
-						retainFrag.mData.add((GrepView.Data)data);
-					}
-					retainFrag.mAdapter.notifyDataSetChanged();
-					retainFrag.searchFragment.mGrepView.setSelection(retainFrag.mData.size() - 1);
-				}
+				retainFrag.statusTV.setText((CharSequence)progress[0]);
+//			} else {
+//				synchronized (retainFrag.mData) {
+//					for (Object data : progress) {
+//						retainFrag.mData.add((GrepView.Data)data);
+//					}
+//					retainFrag.mAdapter.notifyDataSetChanged();
+//					retainFrag.searchFragment.mGrepView.setSelection(retainFrag.mData.size() - 1);
+//				}
 			}
 		}
-		//}
 	}
 
-	private boolean grepRoot(String text) {
+	private boolean grepRoot() {
 
 		PowerManager.WakeLock wl = null;
 		try {
@@ -149,24 +152,29 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 
 			if (retainFrag.fileList == null || retainFrag.newSearch) {
 				retainFrag.fileList = new TreeSet<>();
-				for (CheckedString dir : retainFrag.searchFragment.mPrefs.mDirList) {
+				String st = null;
+				for (Object dir : retainFrag.oriList) {//}searchFragment.mPrefs.mDirList) {
 					//Log.d(TAG, "grepRoot " + text + ", dir " + dir);
-					if (dir.checked && !grepDirectory(new File(dir.string))) {
+					st = dir.toString();
+					if (st.length() > 0 && !grepDirectory(new File(st))) {//}dir.checked && !grepDirectory(new File(dir.string))) {
 						return false;
 					}
 				}
-				retainFrag.cache = new Cache(retainFrag.fileList);
 				retainFrag.newSearch = false;
+				if (callBack instanceof SearchTask) {
+					retainFrag.cache = new Cache(retainFrag.fileList);
+					
+				}
 			}
-			File next;
-			while (retainFrag.cache.hasNext()) {
-				next = retainFrag.cache.next();
-				grepFile(next, retainFrag.cache.get(next));
-			}
-//			for (File f : retainFrag.fileList) {
-//				grepFile(f);
+//			File next;
+//			while (retainFrag.cache.hasNext()) {
+//				next = retainFrag.cache.next();
+//				grepFile(next, retainFrag.cache.get(next));
 //			}
-			retainFrag.cache.reset();
+////			for (File f : retainFrag.fileList) {
+////				grepFile(f);
+////			}
+//			retainFrag.cache.reset();
 		} finally {
 			if (wl != null) {
 				wl.release();
@@ -312,22 +320,32 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 		if (isCancelled()) {
 			return false;
 		}
-		for (CheckedString ext : retainFrag.searchFragment.mPrefs.mExtList) {
-			if (ext.checked) {
-				if (ext.string.equals("*")) {
-					if (dir.getName().indexOf('.') == -1) {
+		if (retainFrag.searchFragment != null) {
+			for (CheckedString ext : retainFrag.searchFragment.mPrefs.mExtList) {
+				if (ext.checked) {
+					if (ext.string.equals("*")) {
+						if (dir.getName().indexOf('.') == -1) {
+							try {
+								return convert(dir);
+							} catch (Exception e) {
+								Log.e(TAG, "checkExt " + dir, e);
+							}
+						}
+					} else if (dir.getName().toLowerCase().endsWith("." + ext.string)) {
 						try {
 							return convert(dir);
 						} catch (Exception e) {
-							Log.e(TAG, "checkExt " + dir, e);
+
 						}
 					}
-				} else if (dir.getName().toLowerCase().endsWith("." + ext.string)) {
-					try {
-						return convert(dir);
-					} catch (Exception e) {
-
-					}
+				}
+			}
+		} else {
+			for (Object ext : retainFrag.oriList) {
+				try {
+					return convert(new File(ext.toString()));
+				} catch (Exception e) {
+					Log.e(TAG, e.getMessage(), e);
 				}
 			}
 		}
@@ -335,7 +353,7 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 	}
 
 	private final Pattern htmlPat = Pattern.compile("(htm|html|xhtml|shtm|shtml)");
-	//private final Pattern plainPat = Pattern.compile("(txt|ini|mk|md|list|config|configure|js|bat|sh|lua|depend|java|c|cpp|h|hpp|jsp|machine|asm|css|desktop|inc|i|plist|pro|py|s|xpm|php|gradle)");
+	//private final Pattern plainPat = Pattern.compile("(ini|mk|md|list|config|configure|js|bat|sh|lua|depend|java|c|cpp|h|hpp|jsp|machine|asm|css|desktop|inc|i|plist|pro|py|s|xpm|php|gradle)");
 	private final Pattern zipPat = Pattern.compile("(zip|gz|7z|bz2|jar|tar|rar|arj|lzh|chm|xz|z)");
 	private long totalSelectedSize;
 
@@ -365,13 +383,17 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 		// file duoc chon co duoi .converted
 		if (htmlPat.matcher(ext).matches()) {
 			fileContent = HtmlUtil.htmlToText(inFile);
-			fileContent = HtmlUtil.changeToVUTimes(fileContent);
+			//fileContent = HtmlUtil.changeToVUTimes(fileContent);
 		} else if (inFilePathLowerCase.endsWith(HtmlUtil.CONVERTED_TXT)
-			|| inFilePathLowerCase.endsWith(".converted.txt")
-			) {
+				   || inFilePathLowerCase.endsWith(".converted.txt")
+				   ) {
 			publishProgress("adding converted text " + inFilePath);
 			retainFrag.fileList.add(inFile);
 			// file txt được chọn có thể đã được convert từ trước nhưng đã cũ
+		} else if (ext.equals("txt")) {
+			publishProgress("converting " + inFilePath);
+			fileContent = FileUtil.readFileWithCheckEncode(inFilePath);
+			//fileContent = HtmlUtil.changeToVUTimes(fileContent);
 		} else if (ext.equals("pdf")) {
 			publishProgress("converting " + inFilePath);
 			final String pdfTextPath = SearcherAplication.PRIVATE_PATH + inFilePath + ".txt";
@@ -499,7 +521,7 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 					String zeNameLower = zeName.toLowerCase();
 					File entryFile = new File(outDirFilePath + "/" + zeName);
 					File convertedEntryFile = new File(entryFile.getAbsolutePath() + HtmlUtil.CONVERTED_TXT); // khi chạy đệ quy thì tạo thêm getFilesDir()
-					Log.d("convertedEntryFile", convertedEntryFile + " exist: " + convertedEntryFile.exists());
+					Log.d(TAG, "convertedEntryFile" + convertedEntryFile + " exist: " + convertedEntryFile.exists());
 
 					ext = FileUtil.getExtension(entryFile);
 					mimeTypeFromExtension = FileUtil.getMimeType(entryFile);
@@ -509,23 +531,23 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 						&& (convertedEntryFile.exists() 
 						&& convertedEntryFile.lastModified() >= inFile.lastModified())) {
 						//publishProgress("adding converted file: " + convertedEntryFile);
-						Log.d("adding converted file: ", convertedEntryFile + " ");
+						Log.d(TAG, "adding converted file: " + convertedEntryFile);
 						retainFrag.fileList.add(convertedEntryFile);
 					} else if (!zeName.endsWith("/")//.isDirectory()
 							   && (entryFile.exists() 
 							   && entryFile.lastModified() >= inFile.lastModified())) {
 						//publishProgress("adding source file: " + entryFile);
-						Log.d("adding source file: ", entryFile + " ");
+						Log.d(TAG, "adding source file: " + entryFile);
 						extractedList.add(entryFile);
 					} else if (!zeName.endsWith("/")//.isDirectory()
 							   && (zeNameLower.matches(SettingsFragment.SEARCH_FILES_SUFFIX)
 							   || (mimeTypeFromExtension.startsWith("text")))) {
 						//publishProgress("extracting " + inFile + "/" + zeName);
-						Log.d("extracting zeName", entryFile.toString());
+						Log.d(TAG, "extracting zeName " + entryFile);
 						//zis.saveToFile(zeName);
 						entryFileList.add(zeName);
 						extractedList.add(entryFile);
-						Log.d("entryFile", entryFile + " written, size: " + entryFile.length());
+						Log.d(TAG, "entryFile " + entryFile + " written, size: " + entryFile.length());
 					}               
 				}
 				if (entryFileList.size() > 0) {
@@ -536,28 +558,27 @@ public class GrepTask extends AsyncTask<String, Object, Boolean> {
 					checkExt(file);
 					fname = file.getName().toLowerCase();
 					if (fname.matches(".*?\\.(doc|ppt|xls|docx|odt|pptx|xlsx|odp|ods|epub|fb2|htm|html|rtf|pdf)")) {
-						Log.d("delete", file.getAbsolutePath());
+						Log.d(TAG, "delete " + file.getAbsolutePath());
 						//tempFList.add(file.getAbsolutePath());
 						file.delete();
 					}
 				}
 				return true;
 			} catch (Exception e) {
-				Log.d("zip process source file", e.getMessage(), e);
+				Log.d(TAG, e.getMessage(), e);
 			} finally {
-				Log.d("GetSourceFileTask", "zis.close()");
+				Log.d(TAG, "GetSourceFileTask zis.close()");
 				extractFile.close();
 			}
-		} else {//}if (plainPat.matcher(ext).matches()) {
-			publishProgress("converting " + inFilePath);
-			fileContent = FileUtil.readFileWithCheckEncode(inFilePath);
-			fileContent = HtmlUtil.changeToVUTimes(fileContent);
-		} 
+		} else {
+			publishProgress("adding converted text " + inFilePath);
+			retainFrag.fileList.add(inFile);
+		}
 		if (fileContent != null && fileContent.length() > 0) {
 			FileUtil.writeFileAsCharset(newFile, fileContent, HtmlUtil.UTF8);
 			retainFrag.fileList.add(newFile);
 			totalSelectedSize += fileContent.getBytes().length;
-			Log.d("newFile exist", newFile + " just written: " + newFile.exists());
+			Log.d(TAG, newFile + " just written: " + newFile.exists());
 		} 
 		return true;
 	}

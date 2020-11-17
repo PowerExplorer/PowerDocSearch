@@ -46,6 +46,7 @@ import android.view.*;
 import android.widget.*;
 import android.webkit.*;
 import java.io.*;
+import net.gnu.common.*;
 
 public class AGrepActivity extends StorageCheckActivity {
 
@@ -414,29 +415,19 @@ public class AGrepActivity extends StorageCheckActivity {
 		alertDialog.show();
 		return true;
 	}
-	
-	public boolean about(MenuItem item) {
-		AndroidUtils.copyAssetToDir(this, SearcherAplication.PRIVATE_PATH, "lic.html"); 
 
-		final WebView wv = new WebView(this);
-		wv.loadUrl(new File(SearcherAplication.PRIVATE_PATH + "/lic.html").toURI().toString());
-		wv.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-		AlertDialog dialog = new AlertDialog.Builder(this)
-			.setIcon(R.drawable.icon)
-			.setIconAttribute(android.R.attr.dialogIcon)
-			.setTitle("Power DocSearch")
-			.setView(wv)
-			.setPositiveButton(R.string.ok,
-			new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					dialog.dismiss();
-				}
-			}).create();
-		dialog.show();
+	public boolean tts(MenuItem item) {
+		Intent it = new Intent(this, TTSActivity.class);
+		startActivity(it);
 		return true;
 	}
 	
-
+	public boolean pdf2Image(MenuItem item) {
+		Intent it = new Intent(this, Pdf2ImageActivity.class);
+		startActivity(it);
+		return true;
+	}
+	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -470,40 +461,7 @@ public class AGrepActivity extends StorageCheckActivity {
 		} else if (itemId == R.id.menu_duplicate_finder) {
 			Intent it = new Intent(this, DuplicateFinderActivity.class);
 			startActivity(it);
-		} else if (itemId == R.id.menu_clear_cache) {
-			AlertDialog.Builder alert = new AlertDialog.Builder(this);
-			alert.setTitle("Clear Caching Files");
-			alert.setIconAttribute(android.R.attr.alertDialogIcon);
-			long[] entry = new long[] {0, 0, 0};
-			FileUtil.getDirSize(SearcherAplication.PRIVATE_DIR, entry);
-			alert.setMessage("Cache has " + Util.nf.format(entry[2]) + " folders, " + Util.nf.format(entry[0])
-							 + " files, " + Util.nf.format(entry[1])
-							 + " bytes. " + "\r\nAre you sure you want to clear the cached files? "
-							 + "\r\nAfter cleaning searching will be slow for the first times " +
-							 "and the searching task maybe incorrect.");
-			alert.setCancelable(true);
-
-			alert.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						int num = FileUtil.deleteFiles(SearcherAplication.PRIVATE_DIR, true);
-						Log.d(TAG, "Clean cache" + num + " files deleted");
-
-					}
-				});
-
-			alert.setPositiveButton("No", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.cancel();
-					}
-				});
-
-			AlertDialog alertDialog = alert.create();
-			alertDialog.show();
-		}
+		} 
         return super.onOptionsItemSelected(item);
     }
 	
