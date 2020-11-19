@@ -435,6 +435,9 @@ public class AGrepActivity extends StorageCheckActivity {
 		if (!privateUse) {
 			menu.findItem(R.id.menu_save_clipboard).setVisible(false);
 		}
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			menu.findItem(R.id.menu_pdf2Image).setVisible(false);
+		}
         return true;
     }
 

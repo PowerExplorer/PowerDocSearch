@@ -2,18 +2,19 @@
 <menu
 	xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<item android:title="Duplicate Finder" 
-		android:id="@+id/menu_duplicate_finder"
-		android:alphabeticShortcut = "D"></item>
+	<item 
+			android:id="@+id/menu_duplicate_finder"
+			android:title="Duplicate Finder" 
+			android:alphabeticShortcut = "D" />
 		
 	<item
-				android:id="@+id/action_pdf2Image"
+				android:id="@+id/menu_pdf2Image"
 				android:onClick="pdf2Image"
 				android:showAsAction="never"
 				android:title="PDFs to Images"/>
 				
 	<item
-                android:id="@+id/action_tts"
+                android:id="@+id/menu_tts"
                 android:onClick="tts"
                 android:showAsAction="never"
                 android:title="Text to Speech"/>
@@ -24,12 +25,12 @@
         android:title="Device Info">
         <menu>
 			<item
-				android:id="@+id/systemFeatures"
+				android:id="@+id/menu_systemFeatures"
 				android:onClick="systemFeatures"
 				android:title="System Features"/>
 
 			<item
-				android:id="@+id/sensors"
+				android:id="@+id/menu_sensors"
 				android:onClick="sensors"
 				android:title="Sensors"/>
 		</menu>
@@ -37,13 +38,14 @@
 
 	<item android:title="Save Clipboard"
 		android:id="@+id/menu_save_clipboard"
-		android:alphabeticShortcut = "S"></item>
+		android:alphabeticShortcut = "S"/>
 
 	
-	<item android:title="@string/label_option"
+	<item 
+		android:title="@string/label_option"
 		android:id="@+id/menu_option"
 		android:icon = "@drawable/ic_menu_preferences"
-		android:alphabeticShortcut = "O"></item>
+		android:alphabeticShortcut = "O"/>
 
 	
 	
