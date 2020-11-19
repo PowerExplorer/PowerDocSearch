@@ -440,7 +440,7 @@ public final class Andro7za {
 	// 2015-08-02 17:49:11 .R..A         9405               CPP/Windows/Window.h
 	//                     .....                            p7zip_15.14_src_all.tar
 	private final static Pattern ENTRY_PATTERN = Pattern.compile("[ \\d]{4}[-/ ][ \\d]{2}[- /][ \\d]{2} [ \\d]{2}[ :][ \\d]{2}[ :][ \\d]{2} ([D\\.]).{3}[A\\.] [ \\d]{12}[ \\d]{15}([^\r\n]+)", Pattern.UNICODE_CASE);
-
+	private final Pattern zipEntryInfoPattern = Pattern.compile("([ \\d]{4}[-/ ][ \\d]{2}[- /][ \\d]{2}) ([ \\d]{2}[ :][ \\d]{2}[ :][ \\d]{2}) ([D\\.]).{4} ([ \\d]{12}) ([ \\d]{12})  ([^\r\n]+)", Pattern.UNICODE_CASE);
 	public Collection<String> listing(File archive7z, String password) throws IOException {
 		return listing(archive7z.getAbsolutePath(), password);
 	}
@@ -464,14 +464,14 @@ public final class Andro7za {
 			int count = 0;
 			while (br.ready() && count < 2) {
 				line = br.readLine();
-				//System.out.println(line);
+				//Log.d(JNI_TAG, line);
 				if ("------------------- ----- ------------ ------------  ------------------------".equals(line)) {
 					count++;
 				}
 				if (count == 1) {
 					Matcher matcher = ENTRY_PATTERN.matcher(line);
-					//				System.out.println(line);
-					//				System.out.println(ENTRY_PATTERN);
+					//Log.d(JNI_TAG, line);
+					//System.out.println(ENTRY_PATTERN);
 					if (matcher.matches()) {
 						if ("D".equals(matcher.group(1))) {
 							nameList.add(matcher.group(2) + "/");
@@ -484,7 +484,7 @@ public final class Andro7za {
 			br.close();
 			fileReader.close();
 			//Collections.sort(nameList);
-			//			Log.i("nameList", collectionToString(nameList, true, "\n"));
+			//Log.i(JNI_TAG, "nameList " + Util.collectionToString(nameList, true, "\n"));
 			return nameList;
 		} finally {
 			closeStreamJNI();

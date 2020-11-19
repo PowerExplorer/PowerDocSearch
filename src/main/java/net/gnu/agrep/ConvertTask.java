@@ -505,6 +505,7 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 
 			ExtractFile extractFile = new ExtractFile(inFilePath, outDirFilePath);
 			try {
+				Pattern p = Pattern.compile(".*?\\.(" + Util.collectionToString(retainFrag.searchFragment.mPrefs.mExtList, false, "|") + ")");
 				String zeName;
 				List<File> extractedList = new LinkedList<File>();
 				Collection<String> entryFileList = new HashSet<String>();
@@ -513,7 +514,7 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 					String zeNameLower = zeName.toLowerCase();
 					File entryFile = new File(outDirFilePath + "/" + zeName);
 					File convertedEntryFile = new File(entryFile.getAbsolutePath() + HtmlUtil.CONVERTED_TXT); // khi chạy đệ quy thì tạo thêm getFilesDir()
-					Log.d(TAG, "convertedEntryFile" + convertedEntryFile + " exist: " + convertedEntryFile.exists());
+					Log.d(TAG, "convertedEntryFile " + convertedEntryFile + " exist: " + convertedEntryFile.exists());
 
 					ext = FileUtil.getExtension(entryFile);
 					mimeTypeFromExtension = FileUtil.getMimeType(entryFile);
@@ -532,8 +533,9 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 						Log.d(TAG, "adding source file: " + entryFile);
 						extractedList.add(entryFile);
 					} else if (!zeName.endsWith("/")//.isDirectory()
-							   && (zeNameLower.matches(SettingsFragment.SEARCH_FILES_SUFFIX)
-							   || (mimeTypeFromExtension.startsWith("text")))) {
+							   && (p.matcher(zeNameLower).matches()
+							   //|| (mimeTypeFromExtension.startsWith("text"))
+							   )) {
 						//publishProgress("extracting " + inFile + "/" + zeName);
 						Log.d(TAG, "extracting zeName " + entryFile);
 						//zis.saveToFile(zeName);

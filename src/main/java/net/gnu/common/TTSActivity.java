@@ -263,7 +263,7 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 				final Set<Locale> locales = TTSActivity.tts.getAvailableLanguages();
 				if (locales != null) {
 					for (Locale l : locales) {
-						Log.i(TAG, l + " " + TTSActivity.tts.isLanguageAvailable(l));
+						//Log.i(TAG, l + " " + TTSActivity.tts.isLanguageAvailable(l));
 						if (TTSActivity.tts.isLanguageAvailable(l) == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
 							langList.add(l.toString());
 						}

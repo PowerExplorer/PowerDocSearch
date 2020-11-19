@@ -29,6 +29,8 @@ public class ExtractFile {
 	
 	private String type = "";
 	private String password = "";
+
+	private String TAG = "ExtractFile";
 	
 	public ExtractFile() {
 	}
@@ -126,7 +128,7 @@ public class ExtractFile {
 //		} else 
 		if (andro7z != null) {
 			iterOfEntries = fList.iterator();
-			Log.d("reinited andro7z", filePath);
+			Log.d(TAG, "reinited andro7z " + filePath);
 //		} else if (fNameLower.endsWith(".rar")) {
 //			arch = new Archive(file);
 //			curFileHeader = null;
@@ -135,7 +137,7 @@ public class ExtractFile {
 			andro7z = new Andro7za();
 			fList = andro7z.listing(filePath, password);
 			iterOfEntries = fList.iterator();
-			Log.d("inited andro7z", filePath);
+			Log.d(TAG, "inited andro7z " + filePath);// + ", " + Util.collectionToString(fList, true, "\n"));
 		}
 	}
 	

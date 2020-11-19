@@ -106,7 +106,7 @@ public class Prefs {
                 prefs.mExtList.add(new CheckedString(c, s));
             }
         } else {
-            exts = sp.getString(KEY_TARGET_EXTENSIONS_OLD + no, "txt|html|htm|docx|doc|odt|pdf|zip|7z");
+            exts = sp.getString(KEY_TARGET_EXTENSIONS_OLD + no, "txt|html|htm|docx|doc|odt|pdf|zip|7z|rar");
             if (exts.length() > 0) {
                 String[] arr = exts.split("\\|");
                 int size = arr.length;
