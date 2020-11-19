@@ -42,6 +42,7 @@ import android.app.*;
 import net.gnu.agrep.*;
 import android.graphics.*;
 import java.util.*;
+import android.text.*;
 
 public class TTSActivity extends CommonActivity implements Serializable, SeekBar.OnSeekBarChangeListener, OnFragmentInteractionListener {
 	
@@ -62,12 +63,12 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 
 	String text = "";
 	String lang = "en_GB";
-	String speed = Float.valueOf(0.7f).toString();
+	String speed = Float.valueOf(0.9f).toString();
 	String pitch = "1";
 	String dot = "1000";
 	String para = "1500";
+	String comma = "400";
 	boolean speak = true;
-	boolean saveText = false;
 	String replace = "";//"ā\nī\nū\nṅ\nṭ\nñ\nḍ\nṇ\nḷ\nṃ\nṁ\nĀ\nĪ\nŪ\nṄ\nṬ\nÑ\nḌ\nṆ\nḶ\nṂ\nṀ";
 	String by = "";//     "a\ni\nu\nn\nt\nnh\nd\nn\nl\nm\nm\nA\nI\nU\nN\nT\nNh\nD\nN\nL\nM\nM";
 	boolean isRegex = false;
@@ -76,12 +77,14 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 	static String curFile = null;
 	static int partNo = -1;
 	static int offset = -1;
-	int vol = 5;
-	String volProgress = "5%";
-	String prevFiles = "";
-	String prevText = "";
-	String prevTextF = "";
-	ArrayList<String> langList = new ArrayList<String>();
+	
+	private int vol = 50;
+	private String volProgress = "50%";
+	//private String prevFiles = "";
+	private String prevText = "";
+	private String prevTextFileName = "";
+	
+	private ArrayList<String> langList = new ArrayList<String>();
 	private FragmentManager supportFragmentManager;
 	private RetainFrag retainFrag;
     
@@ -99,24 +102,56 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
     transient EditText replaceET;
     transient EditText byET;
     transient CheckBox speakCB;
-	transient CheckBox saveTextCB;
 	
 	transient EditText textET;
 	transient Spinner langSpinner;
 	transient EditText speedET;
 	transient EditText pitchET;
 	transient EditText dotET;
+	transient EditText commaET;
 	transient EditText paraET;
 	transient static TextView statusTV;
 	transient ImageButton startBtn;
 	//transient Button cancelBtn;
 	transient ImageButton stopBtn;
 	
-	transient Button filesBtn;
-    transient Button saveToBtn;
+	transient ImageButton filesBtn;
+    transient ImageButton saveToBtn;
+	transient int MAX = 0;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
+		if (tts == null) {
+			tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+					@Override
+					public void onInit(final int status) {
+						if (status == TextToSpeech.SUCCESS) {
+							Log.i(TAG, "DefaultLanguage " + TTSActivity.tts.getDefaultLanguage());
+							Log.i(TAG, "DefaultEngine " + TTSActivity.tts.getDefaultEngine());
+							Log.i(TAG, "DefaultVoice " +TTSActivity. tts.getDefaultVoice());
+							Log.i(TAG, "Language " + TTSActivity.tts.getLanguage());
+							Log.i(TAG, "Voice " + TTSActivity.tts.getVoice());
+							Log.i(TAG, "MaxSpeechInputLength " + MAX);
+							Log.i(TAG, Util.collectionToString(TTSActivity.tts.getFeatures(new Locale("vi_VN")), false, "\n") + ".");
+							if (lang.length() > 0) {
+								String[] split = lang.split("[- _/]");
+								//if (split.length > 1) {
+								int result = TTSActivity.tts.setLanguage(new Locale(split[0], split[1]));
+								if (result == TextToSpeech. LANG_MISSING_DATA 
+									|| result == TextToSpeech.LANG_NOT_SUPPORTED) {
+									showToast(lang + " is not supported");
+									Log.e ("error", lang + " is not supported");
+								}
+								//}
+							}
+							initAdapter();
+						} else {//not success
+							showToast("Initialization TTS Failed!");
+							Log.e (TAG, "Initialization Failed!");
+						}
+					}
+				});
+		}
 		Log.i(TAG, "onCreate " + savedInstanceState);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tts);
@@ -129,7 +164,15 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 			transaction.add(retainFrag, "retainFragTTS");
 			transaction.commit();
         } 
-		
+		try { //A weird error was occurring on some phones with the TTS, hence the try catch
+            //TTS Service
+            final Intent checkIntent = new Intent();
+            checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+            startActivityForResult(checkIntent, CHECK_TTS_AVAILABILITY);
+        } catch (Exception e) {
+            Toast.makeText(this, NO_TTS_AVAILABLE, Toast.LENGTH_LONG).show();
+            //finish();
+        }
 		final View customView = getLayoutInflater().inflate(R.layout.filechoosertoolbar, null);
 		((TextView)customView.findViewById(R.id.title)).setText("Text to Speech");
 		final ActionBar actionBar = getActionBar();
@@ -147,8 +190,8 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 		fileET=(EditText)findViewById(R.id.files);
 		saveToET =(EditText)findViewById(R.id.saveTo);
 		
-		filesBtn = (Button) findViewById(R.id.filesBtn);
-        saveToBtn = (Button) findViewById(R.id.saveToBtn);
+		filesBtn = (ImageButton) findViewById(R.id.filesBtn);
+        saveToBtn = (ImageButton) findViewById(R.id.saveToBtn);
 		
 		textET=(EditText)findViewById(R.id.text);
 		//cancelBtn=(Button)findViewById(R.id.cancelDir);
@@ -156,10 +199,10 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 		speedET = (EditText)findViewById(R.id.speed);
 		pitchET = (EditText)findViewById(R.id.pitch);
 		dotET = (EditText)findViewById(R.id.dot);
+		commaET = (EditText)findViewById(R.id.comma);
 		paraET = (EditText)findViewById(R.id.para);
 		statusTV = (TextView)findViewById(R.id.statusLbl);
 		speakCB = (CheckBox)findViewById(R.id.speak);
-		saveTextCB = (CheckBox)findViewById(R.id.saveText);
 		replaceET = (EditText)findViewById(R.id.replace);
 		byET = (EditText)findViewById(R.id.by);
 		isRegexCB = (CheckBox) findViewById(R.id.regex);
@@ -168,16 +211,17 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 		volProgressTV = (TextView) findViewById(R.id.progress);
         volBar = (SeekBar) findViewById(R.id.vol);
         volBar.setOnSeekBarChangeListener(this);
-		//AudioManager am = (AudioManager) getActivity().getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-		//int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		//volBar.setMax(max);
-		//volBar.setProgress(vol);
-		//volBar.setSecondaryProgress(max/2);
+//		final AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+//		final int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+//		volBar.setMax(max);
+//		volBar.setProgress(vol);
+//		volBar.setSecondaryProgress(max/2);
+//		Log.d(TAG, "vol/max " + vol + ", " + max);
+	}
 
-		if (tts == null) {
-			Object sel = langSpinner.getSelectedItem();
-			tts = new TextToSpeech(getApplicationContext(), new OnInitListener(this, sel == null ? "" : sel.toString()));
-		}
+    protected void onPostCreate(Bundle savedInstanceState) {
+		Log.i(TAG, "onPostCreate " + savedInstanceState);
+		super.onPostCreate(savedInstanceState);
 //		if (curFile == null) {
 		startBtn.setImageResource(R.drawable.exo_controls_play);
 		startBtn.setTag("Play");
@@ -187,91 +231,12 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 		if (savedInstanceState == null) {
 			restore();
 		}
-		Log.i(TAG, "onCreate vol" + vol + ", " + volProgress + ", " + curFile + ", " + partNo + ", " + offset);
+		Log.i(TAG, "onPostCreate vol" + vol + ", " + volProgress + ", " + curFile + ", " + partNo + ", " + offset);
 		if (tts.isSpeaking() || (ttsTask != null && ttsTask.getStatus() == AsyncTask.Status.RUNNING)) {
 			startBtn.setImageResource(R.drawable.exo_controls_pause);
 			startBtn.setTag("Pause");
 		}
-		textET.postDelayed(new Runnable() {
-
-				@Override
-				public void run() {
-					Log.i(TAG, "DefaultLanguage " + tts.getDefaultLanguage());
-					Log.i(TAG, "DefaultEngine " + tts.getDefaultEngine());
-					Log.i(TAG, "DefaultVoice " + tts.getDefaultVoice());
-					Log.i(TAG, "Language " + tts.getLanguage());
-					Log.i(TAG, "Voice " + tts.getVoice());
-					Log.i(TAG, "MaxSpeechInputLength " + tts.getMaxSpeechInputLength());
-					Log.i(TAG, Util.collectionToString(tts.getFeatures(new Locale("vi_VN")), false, "\n") + ".");
-					
-					if (langList.size() == 0) {
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							Set<Locale> locales = tts.getAvailableLanguages();
-							if (locales != null) {
-								for (Locale l : locales) {
-									Log.i(TAG, l + " " + tts.isLanguageAvailable(l));
-									if (tts.isLanguageAvailable(l) == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
-										langList.add(l.toString());
-									}
-								}
-								Collections.sort(langList);
-							} else {
-								getLocales();
-							}
-						} else {
-							getLocales();
-						}
-					}
-					
-					ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-						textET.getContext(), android.R.layout.simple_spinner_item, langList);
-					adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-					langSpinner.setAdapter(adapter);
-					langSpinner.setOnItemSelectedListener(
-						new OnItemSelectedListener() {
-							public void onItemSelected(
-								AdapterView<?> parent, View view, int position, long id) {
-									lang = langSpinner.getSelectedItem() + "";
-									Log.i(TAG, "on Lang " + lang);
-								//((MainActivity)TTSFragment.this.getActivity()).showToast("Spinner1: position=" + position + " id=" + id);
-							}
-
-							public void onNothingSelected(AdapterView<?> parent) {
-								TTSActivity.this.showToast("Language: unselected");
-							}
-						});
-					int i = 0;
-					Log.i(TAG, "langET.onCreateView " + langSpinner.getSelectedItemPosition() + ", " + lang);
-					for (String st : langList) {
-						if (st.equals(lang)) {
-							langSpinner.setSelection(i);
-						}
-						i++;
-					}
-					Log.i(TAG, "langET.onCreateView " + langSpinner.getSelectedItemPosition() + ", " + lang);
-					
-				}
-
-				private void getLocales() {
-					Locale[] locales = Locale.getAvailableLocales();
-					for (Locale l : locales) {
-						String loc = l.toString();
-						if (loc.length() <= 5) {
-							int result = tts.isLanguageAvailable(l);
-
-							if (//result == TextToSpeech.LANG_AVAILABLE ||
-								result == TextToSpeech.LANG_COUNTRY_AVAILABLE //||
-								//result == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE
-								) {// && result != TextToSpeech. LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
-								langList.add(loc);
-								Log.d(TAG, "LanguageAvailable " + loc + " " + result);
-							}
-						}
-					}
-				}
-			}, 1000 );
-
-		Log.i(TAG, "TTSFragment files1" + files);
+		initAdapter();
 		if (files != null && files.length() > 0) {
 			String[] sts = Util.stringToArray(fileET.getText().toString(), "|");//files.split("|");
 			//Arrays.sort(sts);
@@ -288,23 +253,84 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 
 		stopBtn.setOnClickListener(new Button1Listener(this, mListener));
 		
-        //return view;
     }
 
+	private void initAdapter() {
+		MAX = TTSActivity.tts.getMaxSpeechInputLength();
+		
+		if (langList.size() == 0) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				final Set<Locale> locales = TTSActivity.tts.getAvailableLanguages();
+				if (locales != null) {
+					for (Locale l : locales) {
+						Log.i(TAG, l + " " + TTSActivity.tts.isLanguageAvailable(l));
+						if (TTSActivity.tts.isLanguageAvailable(l) == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
+							langList.add(l.toString());
+						}
+					}
+				} else {
+					getLocales();
+				}
+			} else {
+				getLocales();
+			}
+			Collections.sort(langList);
+		}
+		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+			TTSActivity.this, android.R.layout.simple_spinner_item, langList);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		langSpinner.setAdapter(adapter);
+		langSpinner.setOnItemSelectedListener(
+			new OnItemSelectedListener() {
+				public void onItemSelected(
+					final AdapterView<?> parent, final View view, final int position, final long id) {
+					lang = langSpinner.getSelectedItem() + "";
+					Log.i(TAG, "on Lang " + lang);
+				}
+
+				public void onNothingSelected(final AdapterView<?> parent) {
+					showToast("Language: unselected");
+				}
+			});
+		int i = 0;
+		Log.i(TAG, "langET.onPostCreate " + langSpinner.getSelectedItemPosition() + ", " + lang);
+		for (String st : langList) {
+			if (st.equals(lang)) {
+				langSpinner.setSelection(i);
+			}
+			i++;
+		}
+	}
+
+	private void getLocales() {
+		final Locale[] locales = Locale.getAvailableLocales();
+		for (Locale l : locales) {
+			final String loc = l.toString();
+			if (loc.length() <= 5) {
+				final int result = TTSActivity.tts.isLanguageAvailable(l);
+				if (//result == TextToSpeech.LANG_AVAILABLE ||
+					result == TextToSpeech.LANG_COUNTRY_AVAILABLE //||
+					//result == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE
+					) {// && result != TextToSpeech. LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
+					langList.add(loc);
+					//Log.d(TAG, "LanguageAvailable " + loc + " " + result);
+				}
+			}
+		}
+	}
+
 	void save() {
-		Log.i(TAG, "save, lang " + lang + Util.collectionToSlashString(langList));
 		Log.i(TAG, "save1 vol " + vol + ", " + volProgress + ", " + curFile + ", " + partNo + ", " + offset);
 		files = fileET.getText().toString();
 		saveTo = saveToET.getText().toString();
 		text = textET.getText().toString().trim();
 		lang = langSpinner.getSelectedItem() + "";
-		Log.i(TAG, "langET.save " + lang);
 		speak = speakCB.isChecked();
 		speed = speedET.getText().toString();
 		pitch = pitchET.getText().toString();
 		dot = dotET.getText().toString();
+		comma = commaET.getText().toString();
 		para = paraET.getText().toString();
-		saveText = saveTextCB.isChecked();
 		isRegex = isRegexCB.isChecked();
 		caseSensitive = caseSensitiveCB.isChecked();
 		toWav = toWavCB.isChecked();
@@ -312,11 +338,10 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 		by = byET.getText().toString();
 		vol = volBar.getProgress();
 		volProgress = volProgressTV.getText().toString();
-		Log.i(TAG, "save2 vol" + vol + ", " + volProgress + ", " + curFile + ", " + partNo + ", " + offset);
+		Log.i(TAG, "save2 vol " + vol + ", " + volProgress + ", " + curFile + ", " + partNo + ", " + offset);
 	}
 	
 	void restore() {
-		Log.i(TAG, "restore, project " + lang + Util.collectionToSlashString(langList));
 		Log.i(TAG, "restore1 vol " + vol + ", " + volProgress + ", " + curFile + ", " + partNo + ", " + offset);
 		fileET.setText(files);
 		saveToET.setText(saveTo);
@@ -328,14 +353,13 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 			}
 			i++;
 		}
-		Log.i(TAG, "lang, restore " + langSpinner.getSelectedItemPosition() + ", " +  lang + "." + Util.collectionToSlashString(langList));
 		speedET.setText(speed);
 		pitchET.setText(pitch);
 		dotET.setText(dot);
 		paraET.setText(para);
+		commaET.setText(comma);
 		speakCB.setChecked(speak);
-		saveTextCB.setChecked(saveText);
-        replaceET.setText(replace);
+		replaceET.setText(replace);
 		byET.setText(by);
 		toWavCB.setChecked(toWav);
 		isRegexCB.setChecked(isRegex);
@@ -347,45 +371,46 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		Log.i(TAG, "onRestoreInstanceState " + savedInstanceState);
 		super.onRestoreInstanceState(savedInstanceState);
 		if (savedInstanceState != null) {
-			if (fileET != null) {
-				fileET.setText(savedInstanceState.getString("Files"));
-				saveToET.setText(savedInstanceState.getString("SaveTo"));
-				textET.setText(savedInstanceState.getString("Text"));
-				langSpinner.setSelection(savedInstanceState.getInt("Lang"));
-				speedET.setText(savedInstanceState.getString("Speed"));
-				pitchET.setText(savedInstanceState.getString("Pitch"));
-				dotET.setText(savedInstanceState.getString("Dot"));
-				paraET.setText(savedInstanceState.getString("Para"));
-				speakCB.setChecked(savedInstanceState.getBoolean("speak"));
-				saveTextCB.setChecked(savedInstanceState.getBoolean("saveText"));
-				isRegexCB.setChecked(savedInstanceState.getBoolean("isRegex", false));
-				caseSensitiveCB.setChecked(savedInstanceState.getBoolean("caseSensitive", false));
-				toWavCB.setChecked(savedInstanceState.getBoolean("toWav", false));
-				replaceET.setText(savedInstanceState.getString("replace"));
-				byET.setText(savedInstanceState.getString("by"));
-				volProgressTV.setText(savedInstanceState.getString("volProgressTV"));
-				volBar.setProgress(savedInstanceState.getInt("volBar"));
-			} 
-			langList = savedInstanceState.getStringArrayList("projectList");
-			lang = savedInstanceState.getString("langu");
-			volProgress = savedInstanceState.getString("volProgressTV");
-			vol = savedInstanceState.getInt("volBar");
+			fileET.setText(savedInstanceState.getString("Files"));
+			saveToET.setText(savedInstanceState.getString("SaveTo"));
+			textET.setText(savedInstanceState.getString("Text"));
+			langSpinner.setSelection(savedInstanceState.getInt("Lang"));
+			speedET.setText(savedInstanceState.getString("Speed"));
+			pitchET.setText(savedInstanceState.getString("Pitch"));
+			dotET.setText(savedInstanceState.getString("Dot"));
+			commaET.setText(savedInstanceState.getString("comma"));
+			paraET.setText(savedInstanceState.getString("Para"));
+			speakCB.setChecked(savedInstanceState.getBoolean("speak"));
+			isRegexCB.setChecked(savedInstanceState.getBoolean("isRegex", false));
+			caseSensitiveCB.setChecked(savedInstanceState.getBoolean("caseSensitive", false));
+			toWavCB.setChecked(savedInstanceState.getBoolean("toWav", false));
+			replaceET.setText(savedInstanceState.getString("replace"));
+			byET.setText(savedInstanceState.getString("by"));
+			volProgressTV.setText(savedInstanceState.getString("volProgressTV"));
+			volBar.setProgress(savedInstanceState.getInt("volBar"));
+
+//			text = savedInstanceState.getString("Text");
+//			langList = savedInstanceState.getStringArrayList("projectList");
+//			lang = savedInstanceState.getString("langu");
+//			volProgress = savedInstanceState.getString("volProgressTV");
+//			vol = savedInstanceState.getInt("volBar");
 			curFile = savedInstanceState.getString("curFile");
 			partNo = savedInstanceState.getInt("partNo");
 			offset = savedInstanceState.getInt("offset");
-			prevFiles = savedInstanceState.getString("prevFiles");
+			//prevFiles = savedInstanceState.getString("prevFiles");
 			prevText = savedInstanceState.getString("prevText");
-			prevTextF = savedInstanceState.getString("prevTextF");
+			prevTextFileName = savedInstanceState.getString("prevTextFileName");
         }
 	}
 	
 	@Override
     public void onSaveInstanceState(Bundle saveInstanceState) {
-		super.onSaveInstanceState(saveInstanceState);
 		Log.i(TAG, "onSaveInstanceState " + saveInstanceState);
-        if (saveInstanceState == null) {
+        super.onSaveInstanceState(saveInstanceState);
+		if (saveInstanceState == null) {
             return;
         }
         Log.i(TAG, "onSaveInstanceState vol " + vol + ", " + volProgress + ", " + curFile + ", " + partNo + ", " + offset);
@@ -394,17 +419,16 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 		saveInstanceState.putString("Text", textET.getText() + "");
 		saveInstanceState.putInt("Lang", langSpinner.getSelectedItemPosition());
 		saveInstanceState.putString("langu", lang);
-		Log.i(TAG, "onSaveInstanceState " + langSpinner.getSelectedItemPosition() + ", " + lang);
 		saveInstanceState.putString("Speed", speedET.getText() + "");
 		saveInstanceState.putString("Pitch", pitchET.getText() + "");
 		saveInstanceState.putBoolean("speak", speakCB.isChecked());
-		saveInstanceState.putBoolean("saveText", saveTextCB.isChecked());
 		saveInstanceState.putBoolean("isRegex", isRegexCB.isChecked());
 		saveInstanceState.putBoolean("caseSensitive", caseSensitiveCB.isChecked());
 		saveInstanceState.putBoolean("toWav", toWavCB.isChecked());
 		saveInstanceState.putString("replace", replaceET.getText() + "");
 		saveInstanceState.putString("by", byET.getText() + "");
 		saveInstanceState.putString("Dot", dotET.getText() + "");
+		saveInstanceState.putString("comma", commaET.getText() + "");
 		saveInstanceState.putString("Para", paraET.getText() + "");
 		saveInstanceState.putStringArrayList("projectList", langList);
 		saveInstanceState.putInt("volBar", volBar.getProgress());
@@ -412,16 +436,16 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 		saveInstanceState.putString("curFile", curFile);
 		saveInstanceState.putInt("partNo", partNo);
 		saveInstanceState.putInt("offset", offset);
-		saveInstanceState.putString("prevFiles", prevFiles);
+		//saveInstanceState.putString("prevFiles", prevFiles);
 		saveInstanceState.putString("prevText", prevText);
-		saveInstanceState.putString("prevTextF", prevTextF);
+		saveInstanceState.putString("prevTextFileName", prevTextFileName);
     }
 	
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		try {
-            //Log.d(TAG, "TTS Response: "+requestCode);
+            Log.d(TAG, "TTS Response: " + requestCode);
             if (requestCode == CHECK_TTS_AVAILABILITY) {
                 if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                     // success, create the TTS instance
@@ -430,18 +454,18 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
                     // missing data, install it
                     Toast.makeText(this, NO_TTS_ANDROID_MARKET_REDIRECT, Toast.LENGTH_LONG).show();
 
-                    PackageManager pm = getPackageManager();
-                    Intent installIntent = new Intent();
+                    final Intent installIntent = new Intent();
                     installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                    ResolveInfo resolveInfo = pm.resolveActivity( installIntent, PackageManager.MATCH_DEFAULT_ONLY );
+                    final PackageManager pm = getPackageManager();
+                    final ResolveInfo resolveInfo = pm.resolveActivity(installIntent, PackageManager.MATCH_DEFAULT_ONLY);
 
-                    if( resolveInfo == null ) {
+                    if (resolveInfo == null) {
 						// Not able to find the activity which should be started for this intent
                         Toast.makeText(this, NO_TTS_AVAILABLE, Toast.LENGTH_LONG).show();
                     } else {
-						startActivity( installIntent );
+						startActivity(installIntent);
                     }
-                    //finish();
+                    
                 }
             } 
         } catch (Exception e) {
@@ -450,30 +474,18 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
         }
 	}
 
-//	@Override
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-//		Log.i(TAG, "onAttach");
-//        try {
-//            mListener = (OnFragmentInteractionListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString()
-//										 + " must implement OnFragmentInteractionListener");
-//        }
-//    }
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//		Log.i(TAG, "onDetach");
-////        mListener = null;
-//    }
+	@Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //Close the Text to Speech Library
+        if(tts != null) {
+            tts.stop();
+            tts.shutdown();
+			tts = null;
+            Log.d(TAG, "TTS Destroyed");
+        }
+    }
 
-//	@Override
-//	public void onDestroy() {
-//		super.onDestroy();
-//		tts.shutdown();
-//	}
 
 	@Override
 	public void onOk(FragmentActivity fra) {
@@ -486,17 +498,14 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 			cancel = true;
 			if (ttsTask != null) {
 				ttsTask.cancel(true);
-				ttsTask.publishProgress("");
+				//ttsTask.publishProgress("");
+				statusTV.setText("");
 			}
 			tts.stop();
 			startBtn.setImageResource(R.drawable.exo_controls_play);
 			startBtn.setTag("Play");
 			stopService(new Intent(this, ForegroundService.class));
 			return;
-		}
-		if (speakCB.isChecked()) {
-			startBtn.setImageResource(R.drawable.exo_controls_pause);
-			startBtn.setTag("Pause");
 		}
 		if (speed.length() == 0 && pitch.length() == 0 || "0".equals(speed) && "0".equals(pitch)) {
 			showToast("Invalid speed or pitch");
@@ -510,13 +519,13 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 			showToast("Invalid language");
 			return;
 		}
-		if (files.trim().length() == 0 && text.trim().length() == 0 || "0".equals(dot) && "0".equals(para)) {
+		if (files.trim().length() == 0 && text.trim().length() == 0) {
 			showToast("Invalid files or text");
 			return;
 		}
 		String[] split = lang.split("[- _/]");
 		if (split.length > 1) {
-			int result = tts.setLanguage(new Locale(split[0], split[1]));
+			final int result = tts.setLanguage(new Locale(split[0], split[1]));
 			if (result == TextToSpeech. LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
 				Toast.makeText(this, lang + " is not supported", Toast.LENGTH_SHORT).show();
 				Log.e ("error", lang + " is not supported");
@@ -533,67 +542,51 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 			showToast("Speak and/or Convert to Wav?");
 			return;
 		}
-		String st = null;
-		if (!prevFiles.equals(files) 
-			|| !prevText.equalsIgnoreCase(text)) {
-//				ttsFrag.curFile = null;
-//				ttsFrag.partNo = -1;
-//				ttsFrag.offset = -1;
-			if (text.length() > 0
-				&& !prevText.equalsIgnoreCase(text)) {
+		//if (speakCB.isChecked()) {
+			startBtn.setImageResource(R.drawable.exo_controls_pause);
+			startBtn.setTag("Pause");
+		//}
+		
+		String st = "";
+//		ttsFrag.curFile = null;
+//		ttsFrag.partNo = -1;
+//		ttsFrag.offset = -1;
+		if (text.length() > 0) {
+			if (!prevText.equalsIgnoreCase(text)) {
 				try {
-//					if (mNotificationManager == null) {
-//						mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//					}
-//					createNotification("Searcher", "Touch to Open", false, "Text to Speech");
-					String fPath = SearcherAplication.PRIVATE_PATH + "/tts." + Util.dtf.format(System.currentTimeMillis()).replaceAll("[/\\?<>\"':|\\\\]+", "_") + ".txt";
-					FileUtil.writeFileAsCharset(fPath, text, "utf-8");
-					new File(fPath).deleteOnExit();
-					prevTextF = fPath;
-					st = fPath + "|" + files;
+					prevTextFileName = SearcherAplication.PRIVATE_PATH + "/tts." + Util.dtf.format(System.currentTimeMillis()).replaceAll("[/\\?<>\"':|\\\\]+", "_") + ".txt";
+					FileUtil.writeFileAsCharset(prevTextFileName, text, "utf-8");
+					new File(prevTextFileName).deleteOnExit();
+					st = prevTextFileName;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			} else if (text.length() > 0
-					   && prevText.equalsIgnoreCase(text)) {
-				st = prevTextF + "|" + files;
-			} else {
-				st = fileET.getText().toString();
-			}
-			prevFiles = files;
-			prevText = text;
-		} else {
-			st = prevTextF + "|" + files;
+				prevText = text;
+			} else if (prevText.equalsIgnoreCase(text)) {
+				st = prevTextFileName;
+			} 
 		}
-		//ttsFrag.text = ttsFrag.textET.getText().toString().trim();
+		final Editable textE = fileET.getText();
+		if (textE.length() > 0) {
+			if (st.length() > 0) {
+				st = st + "|" + textE;
+			} else {
+				st = textE.toString();
+			}
+		}
 		Log.d(TAG, "tts st " + st);
 		if (retainFrag.callBackTask != null) {
 			retainFrag.callBackTask.cancel(true);
 		}
 		ttsTask = new TTSTask(this, retainFrag);
 		retainFrag.callBackTask = ttsTask;
+		retainFrag.fileList = null;
 		retainFrag.oriList = Util.stringToList(st, "|");//mPrefs.mDirList;
 		retainFrag.statusTV = statusTV;
 		retainFrag.mTask = new ConvertTask(retainFrag, ttsTask);//SettingsFragment.this);
 		retainFrag.mTask.execute();
-//		curFrag.selectedFiles = Util.stringToArray(st, "|");
-//		curFrag.requestTts = true;
-//		curFrag.stopReadAndSearch();
-//		curFrag.currentZipFileName = ""; // làm dấu để khỏi show web getSourceFile
-//		curFrag.load = "Search";
-//		curFrag.requestCompare = false;
-//		curFrag.requestSearching = false;
-//		curFrag.getSourceFileTask = new GetSourceFileTask(curFrag);
-//		curFrag.getSourceFileTask.execute();
 		return;
-
 	}
-
-
-//	@Override
-//	public void onCancelChooser(FragmentActivity path) {
-//		
-//	}
 
 	@Override
 	public void onButton1(FragmentActivity path) {
@@ -602,9 +595,8 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 		cancel = true;
 		if (ttsTask != null) {
 			ttsTask.cancel(true);
-			ttsTask.publishProgress("");
+			statusTV.setText("");
 		}
-		//save();
 		curFile = null;
 		partNo = -1;
 		offset = -1;
@@ -614,21 +606,10 @@ public class TTSActivity extends CommonActivity implements Serializable, SeekBar
 		startBtn.setTag("Play");
 		stopService(new Intent(this, ForegroundService.class));
 		return;
-
 	}
-
-//	@Override
-//	public void onButton2(FragmentActivity path) {
-//		
-//	}
 
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
-
-//		AudioManager am = (AudioManager) getActivity().getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-//		int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-//		Log.i(TAG, "onProgressChanged vol" + vol + ", " + volProgress + ", " + progress + "/ " + max + ", " +curFile + ", " + partNo + ", " + offset);
-
 		if (ttsTask != null) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				ttsTask.myBundleAlarm.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME,

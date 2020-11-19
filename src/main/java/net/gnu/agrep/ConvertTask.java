@@ -39,8 +39,8 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 	private static final String TAG = "ConvertTask";
 
 	//private ProgressDialog mProgressDialog;
-	private int mFileCount=0;
-	private int mFoundcount=0;
+//	private int mFileCount=0;
+//	private int mFoundcount=0;
 	private boolean mCancelled;
 	private RetainFrag retainFrag;
 	private AsyncTask callBack;
@@ -154,10 +154,14 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 				retainFrag.fileList = new TreeSet<>();
 				String st = null;
 				for (Object dir : retainFrag.oriList) {//}searchFragment.mPrefs.mDirList) {
-					//Log.d(TAG, "grepRoot " + text + ", dir " + dir);
+					//Log.d(TAG, "grepRoot dir " + dir);
 					st = dir.toString();
-					if (st.length() > 0 && !grepDirectory(new File(st))) {//}dir.checked && !grepDirectory(new File(dir.string))) {
-						return false;
+					try {
+						if (st.length() > 0 && !grepDirectory(new File(st))) {//}dir.checked && !grepDirectory(new File(dir.string))) {
+							return false;
+						}
+					} catch (Exception e) {
+						Log.e(TAG, e.getMessage(), e);
 					}
 				}
 				retainFrag.newSearch = false;
@@ -166,6 +170,7 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 					
 				}
 			}
+			//Log.d(TAG, "retainFrag.fileList " + Util.collectionToString(retainFrag.fileList, true, "\n"));
 //			File next;
 //			while (retainFrag.cache.hasNext()) {
 //				next = retainFrag.cache.next();
@@ -184,8 +189,8 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 	}
 
 
-	boolean grepDirectory(final File dir) {
-		//Log.d(TAG, "grepDirectory " + dir);
+	boolean grepDirectory(final File dir) throws Exception {
+		//Log.d(TAG, "grepDirectory " + dir + ", dir.isFile() " + dir.isFile());
 		if (isCancelled()) {
 			return false;
 		}
@@ -217,106 +222,107 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 		return true;
 	}
 
-	boolean grepFile(final File file, final String str) {
-		//Log.d(TAG, "grepFile " + file);
-		if (isCancelled()) {
-			return false;
-		}
-//		final InputStream is;
-//		try {
-//			is = new BufferedInputStream(new FileInputStream(file));//, 65536);
-//			is.mark(65536);
-//
-//			//  文字コードの判定
-//			String encode = null;
-//			try {
-//				final UniversalDetector detector = new UniversalDetector();
-//				try {
-//					int nread;
-//					byte[] buff = new byte[4096];
-//					if ((nread = is.read(buff)) > 0) {
-//						detector.handleData(buff, 0, nread);
-//					}
-//					detector.dataEnd();
-//				} catch ( FileNotFoundException e ) {
-//					e.printStackTrace();
-//					is.close();
-//					return true;
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//					is.close();
-//					return true;
-//				}
-//				encode = detector.getCharset();
-//				detector.reset();
-//				detector.destroy();
-//			} catch ( UniversalDetector.DetectorException e) {
-//			}
-//			is.reset();
-		BufferedReader br=null;
-		try {
-//				if (encode != null) {
-//					br = new BufferedReader(new InputStreamReader(is, encode), 65536);
-//				} else {
-			br = new BufferedReader(new StringReader(str));//new InputStreamReader(is), 65536);
-			//}
-
-			String text;
-			int line = 0;
-			Pattern pattern = retainFrag.searchFragment.mPattern;
-			Matcher m = null;
-			ArrayList<GrepView.Data>    data  = null ;
-			mFileCount++;
-			while ((text = br.readLine()) != null) {
-				line ++;
-				if (m == null) {
-					m = pattern.matcher(text);
-				} else {
-					m.reset(text);
-				}
-				if (m.find()) {
-					//found = true;
-
-					synchronized (retainFrag.mData) {
-						mFoundcount++;
-						if (data == null) {
-							data = new ArrayList<GrepView.Data>();
-						}
-						data.add(new GrepView.Data(file, line, text));
-
-						if (mFoundcount < 20) {
-							publishProgress(data.toArray(new GrepView.Data[0]));
-							data = null;
-						}
-					}
-					if (mCancelled) {
-						break;
-					}
-				}
-			}
-			//br.close();
-			//is.close();
-			if (data != null) {
-				publishProgress(data.toArray(new GrepView.Data[0]));
-				data = null;
-			} else {
-				publishProgress((GrepView.Data[])null);
-			}
-			//if (!found) {
-			//if (mFileCount % 10 == 0) {
-			//publishProgress((GrepView.Data[])null);
-			//}
-			//}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
+//	boolean grepFile(final File file, final String str) {
+//		//Log.d(TAG, "grepFile " + file);
+//		if (isCancelled()) {
+//			return false;
 //		}
-		return true;
-	}
+////		final InputStream is;
+////		try {
+////			is = new BufferedInputStream(new FileInputStream(file));//, 65536);
+////			is.mark(65536);
+////
+////			//  文字コードの判定
+////			String encode = null;
+////			try {
+////				final UniversalDetector detector = new UniversalDetector();
+////				try {
+////					int nread;
+////					byte[] buff = new byte[4096];
+////					if ((nread = is.read(buff)) > 0) {
+////						detector.handleData(buff, 0, nread);
+////					}
+////					detector.dataEnd();
+////				} catch ( FileNotFoundException e ) {
+////					e.printStackTrace();
+////					is.close();
+////					return true;
+////				} catch (IOException e) {
+////					e.printStackTrace();
+////					is.close();
+////					return true;
+////				}
+////				encode = detector.getCharset();
+////				detector.reset();
+////				detector.destroy();
+////			} catch ( UniversalDetector.DetectorException e) {
+////			}
+////			is.reset();
+//		BufferedReader br=null;
+//		try {
+////				if (encode != null) {
+////					br = new BufferedReader(new InputStreamReader(is, encode), 65536);
+////				} else {
+//			br = new BufferedReader(new StringReader(str));//new InputStreamReader(is), 65536);
+//			//}
+//
+//			String text;
+//			int line = 0;
+//			Pattern pattern = retainFrag.searchFragment.mPattern;
+//			Matcher m = null;
+//			ArrayList<GrepView.Data>    data  = null ;
+//			mFileCount++;
+//			while ((text = br.readLine()) != null) {
+//				line ++;
+//				if (m == null) {
+//					m = pattern.matcher(text);
+//				} else {
+//					m.reset(text);
+//				}
+//				if (m.find()) {
+//					//found = true;
+//
+//					synchronized (retainFrag.mData) {
+//						mFoundcount++;
+//						if (data == null) {
+//							data = new ArrayList<GrepView.Data>();
+//						}
+//						data.add(new GrepView.Data(file, line, text));
+//
+//						if (mFoundcount < 20) {
+//							publishProgress(data.toArray(new GrepView.Data[0]));
+//							data = null;
+//						}
+//					}
+//					if (mCancelled) {
+//						break;
+//					}
+//				}
+//			}
+//			//br.close();
+//			//is.close();
+//			if (data != null) {
+//				publishProgress(data.toArray(new GrepView.Data[0]));
+//				data = null;
+//			} else {
+//				publishProgress((GrepView.Data[])null);
+//			}
+//			//if (!found) {
+//			//if (mFileCount % 10 == 0) {
+//			//publishProgress((GrepView.Data[])null);
+//			//}
+//			//}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+////		} catch (IOException e1) {
+////			e1.printStackTrace();
+////		}
+//		return true;
+//	}
 
-	private boolean checkExt(final File dir) {
+	private boolean checkExt(final File dir) throws Exception {
+		//Log.d(TAG, "checkExt " + dir.getAbsolutePath());
 		if (isCancelled()) {
 			return false;
 		}
@@ -325,29 +331,15 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 				if (ext.checked) {
 					if (ext.string.equals("*")) {
 						if (dir.getName().indexOf('.') == -1) {
-							try {
-								return convert(dir);
-							} catch (Exception e) {
-								Log.e(TAG, "checkExt " + dir, e);
-							}
+							return convert(dir);
 						}
 					} else if (dir.getName().toLowerCase().endsWith("." + ext.string)) {
-						try {
-							return convert(dir);
-						} catch (Exception e) {
-
-						}
+						return convert(dir);
 					}
 				}
 			}
 		} else {
-			for (Object ext : retainFrag.oriList) {
-				try {
-					return convert(new File(ext.toString()));
-				} catch (Exception e) {
-					Log.e(TAG, e.getMessage(), e);
-				}
-			}
+			return convert(dir);
 		}
 		return true;
 	}
@@ -358,8 +350,8 @@ public class ConvertTask extends AsyncTask<Void, Object, Boolean> {
 	private long totalSelectedSize;
 
 	private boolean convert(final File inFile) throws IOException, Exception {
-		//Log.d(TAG, "convert " + inFile);
 		final String inFilePath = inFile.getAbsolutePath();
+		//Log.d(TAG, "convert " + inFilePath);
 		final File newFile;
 		if (inFilePath.startsWith(SearcherAplication.PRIVATE_PATH)) {
 			newFile = new File(inFilePath + HtmlUtil.CONVERTED_TXT);

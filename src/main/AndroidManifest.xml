@@ -171,6 +171,7 @@
 		</activity>
 		
 		<activity android:name="net.gnu.common.Pdf2ImageActivity"
+			android:screenOrientation="portrait"
 			android:label="PDF to Images" 
 			android:icon="@drawable/icon"
             android:launchMode="singleTask"
@@ -194,7 +195,7 @@
 			android:icon="@drawable/icon"
             android:launchMode="singleTask"
             android:parentActivityName=".AGrepActivity"
-			android:configChanges="orientation|keyboardHidden|screenSize">
+			>
 			<intent-filter>
 				<action android:name="android.intent.action.SEND" />
 				<action android:name="android.intent.action.SENDTO" />

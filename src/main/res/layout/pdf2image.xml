@@ -471,7 +471,6 @@
 						android:layout_height="match_parent"
 						android:layout_weight="0.5"
 						app:cpv_colorShape="square"
-
 					/>
 				</LinearLayout >
 
@@ -481,11 +480,12 @@
 
 		<com.jaredrummler.android.colorpicker.ColorPickerView
 			android:id="@id/cpv_color_picker_view"
-			android:layout_width="320dp"
-			android:layout_height="320dp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			app:cpv_alphaChannelVisible="true"
 			android:gravity="center"
 			android:layout_gravity="center"
+			app:cpv_showDialog="true"
 		/>
 
 	</LinearLayout>
